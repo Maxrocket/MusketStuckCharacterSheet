@@ -3,23 +3,40 @@ package musketstuckcharactersheet.dice;
 public class DiceParser {
 
     public Die parse(String die) {
-        die = die.trim();
-        Die cur = null;
-        int nextOp = -1;
-        Die nextDie;
+        die = die.replace(" ", "");
+        Die cur = null; //die to be made
+        int nextOp = -1; //operation before next die
         while (die.length() > 0) {
             String next = "";
-            if (die.charAt(0) == '(') {
+            if (die.charAt(0) == '(') { // if brackets
                 die = die.substring(1);
                 String bracketed = "";
-                while (die.charAt(0) != ')') {
+                while (die.charAt(0) != ')') { //find end of brackets
                     bracketed += die.charAt(0);
                     die = die.substring(1);
                 }
                 die = die.substring(1);
-                cur = updateDie(cur, nextOp, parse(bracketed));
+                if (die.length() == 0) {
+                    die = " "; //used to prevent errors when calling at charAt(0)
+                }
+                cur = updateDie(cur, nextOp, parse(bracketed)); //parse inside of brackets
+                boolean advantage = die.charAt(0) == 'a'; //check for advantage
+                if (die.charAt(0) == 'a' || die.charAt(0) == 'z') {
+                    die = die.substring(1);
+                    String advCount = "";
+                    while (die.charAt(0) > 47 && die.charAt(0) < 58) { //get advantage count
+                        advCount += die.charAt(0);
+                        die = die.substring(1);
+                        if (die.length() == 0) {
+                            die = " ";
+                        }
+                    }
+                    int adv = Integer.parseInt(advCount);
+                    cur.adv = advantage; //set advantage/disadvantage
+                    cur.rollCount = adv + 1; //set rolls
+                }
             } else {
-                while (die.charAt(0) > 47 && die.charAt(0) < 58) {
+                while (die.charAt(0) > 47 && die.charAt(0) < 58) { //find dice count or constant
                     next += die.charAt(0);
                     die = die.substring(1);
                     if (die.length() == 0) {
@@ -27,10 +44,10 @@ public class DiceParser {
                     }
                 }
                 int count = Integer.parseInt(next);
-                if (die.charAt(0) == 'd') {
+                if (die.charAt(0) == 'd') { // check for dice
                     next = "";
                     die = die.substring(1);
-                    while (die.charAt(0) > 47 && die.charAt(0) < 58) {
+                    while (die.charAt(0) > 47 && die.charAt(0) < 58) { //find size
                         next += die.charAt(0);
                         die = die.substring(1);
                         if (die.length() == 0) {
@@ -38,13 +55,13 @@ public class DiceParser {
                         }
                     }
                     int size = Integer.parseInt(next);
-                    cur = updateDie(cur, nextOp, new Die(new AdB(count, size)));
+                    cur = updateDie(cur, nextOp, new Die(new AdB(count, size))); //create die
                 } else {
-                    cur = updateDie(cur, nextOp, new Die(new C(count)));
+                    cur = updateDie(cur, nextOp, new Die(new C(count))); // create constant
                 }
             }
             die = die.trim();
-            if (die.length() > 0) {
+            if (die.length() > 0) { //check for operation
                 switch (die.charAt(0)) {
                     case '+':
                         nextOp = 0;
