@@ -33,11 +33,11 @@ public class Die {
     }
 
     private Pair<String[], int[]> collapseDice(String[] ss, int[] is) {
-        String s = "";
+        String s = "(";
         for (int i = 0; i < ss.length - 1; i++) {
             s += ss[i] + " + ";
         }
-        s += ss[ss.length - 1];
+        s += ss[ss.length - 1] + ")";
         int total = 0;
         for (int i : is) {
             total += i;
@@ -46,23 +46,23 @@ public class Die {
     }
 
     private Pair<String[], int[]> collapseDie(String s0, String s1, int i0, int i1, int op) {
-        String s = s0 + " ";
+        String s = "";
         int total = i0;
         switch (op) {
             case 0:
-                s += "+ " + s1;
+                s = s0 + " + " + s1;
                 total += i1;
                 break;
             case 1:
-                s += "- " + s1;
+                s = "(" + s0 + ") - (" + s1 + ")";
                 total -= i1;
                 break;
             case 2:
-                s += "* " + s1;
+                s = "(" + s0 + ") * (" + s1 + ")";
                 total *= i1;
                 break;
             case 3:
-                s += "/ " + s1;
+                s = "(" + s0 + ") / (" + s1 + ")";
                 total /= i1;
                 break;
         }
