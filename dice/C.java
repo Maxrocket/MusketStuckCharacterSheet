@@ -6,20 +6,20 @@ import musketstuckcharactersheet.OnRoll;
 
 public class C extends Dice {
 
-        public int value;
+    public int value;
 
-        public C(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
-            return new Pair(new String[]{value + ""}, new int[]{value});
-        }
-
-        @Override
-        public String toString() {
-            return value + "";
-        }
-
+    public C(int value) {
+        this.value = value;
     }
+
+    @Override
+    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
+        return new Pair(new String[]{value + ""}, new int[]{value});
+    }
+
+    @Override
+    public String toString() {
+        return value + "";
+    }
+
+}

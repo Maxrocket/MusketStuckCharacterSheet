@@ -35,29 +35,36 @@ public class Die {
     public Pair<String, Integer> roll(ArrayList<OnRoll> onRollArr) {
         ArrayList<Pair<String, Integer>> rolls = new ArrayList<>();
         if (op == -1) {
+            if (d instanceof C) {
+                return new Pair(d.roll(onRollArr).getKey()[0], d.roll(onRollArr).getValue()[0]);
+            }
             //roll
             for (int i = 0; i < rollCount; i++) {
                 Pair<String[], int[]> dp = d.roll(onRollArr);
                 rolls.add(collapseDice(dp.getKey(), dp.getValue()));
             }
             //find selected
-            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>)(rolls.clone());
+            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>) (rolls.clone());
             sorted.sort(sorter);
             Pair<String, Integer> chosen = sorted.get(0);
-            if (!adv){
-                chosen = rolls.get(sorted.size() - 1);
+            if (!adv) {
+                chosen = sorted.get(sorted.size() - 1);
             }
             //combine strings
-            String str = "";
-            for (Pair<String, Integer> roll : rolls) {
-                str += roll.getKey();
+            String str = rolls.get(0).getKey();
+            if (rollCount > 1) {
+                str = "";
+                for (Pair<String, Integer> roll : rolls) {
+                    str += roll.getKey();
+                }
+                //isolate selected roll
+                String chose = chosen.getKey();
+                int pos = str.indexOf(chose);
+                chose = "{" + chose.substring(1, chose.length() - 1) + "}";
+                //put together and return
+                str = str.substring(0, pos) + chose + str.substring(pos + chose.length());
             }
-            //isolate selected roll
-            String chose = chosen.getKey();
-            String[] ss = str.split(chose, 2);
-            chose = "{" + chose.substring(1, chose.length()) + "}";
-            //put together and return
-            return new Pair(ss[0] + chose + ss[1], chosen.getValue());
+            return new Pair(str, chosen.getValue());
         } else {
             //roll
             for (int i = 0; i < rollCount; i++) {
@@ -66,23 +73,27 @@ public class Die {
                 rolls.add(collapseDie(ds0p.getKey(), ds1p.getKey(), ds0p.getValue(), ds1p.getValue(), op));
             }
             //find selected
-            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>)(rolls.clone());
+            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>) (rolls.clone());
             sorted.sort(sorter);
             Pair<String, Integer> chosen = sorted.get(0);
-            if (!adv){
-                chosen = rolls.get(sorted.size() - 1);
+            if (!adv) {
+                chosen = sorted.get(sorted.size() - 1);
             }
             //combine strings
-            String str = "";
-            for (Pair<String, Integer> roll : rolls) {
-                str += "(" + roll.getKey() + ")";
+            String str = rolls.get(0).getKey();
+            if (rollCount > 1) {
+                str = "";
+                for (Pair<String, Integer> roll : rolls) {
+                    str += "(" + roll.getKey() + ")";
+                }
+                //isolate selected roll
+                String chose = "(" + chosen.getKey() + ")";
+                int pos = str.indexOf(chose);
+                chose = "{" + chose.substring(1, chose.length() - 1) + "}";
+                //put together and return
+                str = str.substring(0, pos) + chose + str.substring(pos + chose.length());
             }
-            //isolate selected roll
-            String chose = "(" + chosen.getKey() + ")";
-            String[] ss = str.split(chose, 2);
-            chose = "{" + chose.substring(1, chose.length()) + "}";
-            //put together and return
-            return new Pair(ss[0] + chose + ss[1], chosen.getValue());
+            return new Pair(str, chosen.getValue());
         }
     }
 

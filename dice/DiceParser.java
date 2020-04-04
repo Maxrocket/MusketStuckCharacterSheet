@@ -19,7 +19,7 @@ public class DiceParser {
                 if (die.length() == 0) {
                     die = " "; //used to prevent errors when calling at charAt(0)
                 }
-                cur = updateDie(cur, nextOp, parse(bracketed)); //parse inside of brackets
+                Die bracketDie = parse(bracketed); //parse inside of brackets
                 boolean advantage = die.charAt(0) == 'a'; //check for advantage
                 if (die.charAt(0) == 'a' || die.charAt(0) == 'z') {
                     die = die.substring(1);
@@ -32,9 +32,10 @@ public class DiceParser {
                         }
                     }
                     int adv = Integer.parseInt(advCount);
-                    cur.adv = advantage; //set advantage/disadvantage
-                    cur.rollCount = adv + 1; //set rolls
+                    bracketDie.adv = advantage; //set advantage/disadvantage
+                    bracketDie.rollCount = adv + 1; //set rolls
                 }
+                cur = updateDie(cur, nextOp, bracketDie); //parse inside of brackets
             } else {
                 while (die.charAt(0) > 47 && die.charAt(0) < 58) { //find dice count or constant
                     next += die.charAt(0);
