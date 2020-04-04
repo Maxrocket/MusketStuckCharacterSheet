@@ -1,11 +1,14 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.ui;
 
+import musketstuckcharactersheet.structures.Armour;
+import musketstuckcharactersheet.structures.Character;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import musketstuckcharactersheet.Window;
 
 public class ArmourListElement extends JPanel {
 

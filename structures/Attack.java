@@ -1,7 +1,8 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
 import javafx.util.Pair;
+import musketstuckcharactersheet.OnRoll;
 
 public class Attack {
 

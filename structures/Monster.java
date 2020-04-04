@@ -1,4 +1,4 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.structures;
 
 import java.util.HashMap;
 import java.util.Map;

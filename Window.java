@@ -1,5 +1,13 @@
 package musketstuckcharactersheet;
 
+import musketstuckcharactersheet.ui.WeaponListElement;
+import musketstuckcharactersheet.ui.ArmourListElement;
+import musketstuckcharactersheet.structures.Monster;
+import musketstuckcharactersheet.structures.Armour;
+import musketstuckcharactersheet.structures.Weapon;
+import musketstuckcharactersheet.structures.Attack;
+import musketstuckcharactersheet.structures.Character;
+import musketstuckcharactersheet.structures.Dice;
 import com.sun.glass.events.KeyEvent;
 import java.awt.AWTException;
 import java.awt.Color;
@@ -20,9 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;

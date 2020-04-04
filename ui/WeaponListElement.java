@@ -1,7 +1,10 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.ui;
 
+import musketstuckcharactersheet.structures.Attack;
+import musketstuckcharactersheet.structures.Weapon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import musketstuckcharactersheet.Window;
 
 public class WeaponListElement extends JPanel {
 

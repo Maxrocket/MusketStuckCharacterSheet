@@ -1,8 +1,10 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.ui;
 
+import musketstuckcharactersheet.structures.Attack;
 import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.event.MouseInputListener;
+import musketstuckcharactersheet.Window;
 
 public class AttackListElement extends JLabel {
 
