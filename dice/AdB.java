@@ -1,5 +1,7 @@
 package musketstuckcharactersheet.dice;
 
+import javafx.util.Pair;
+
 public class AdB extends Dice {
 
         public int count, size;
@@ -10,12 +12,14 @@ public class AdB extends Dice {
         }
 
         @Override
-        public int roll() {
-            int total = 0;
+        public Pair<String[], int[]> roll() {
+            int[] rolls = new int[count];
+            String[] strings = new String[count];
             for (int i = 0; i < count; i++) {
-                total += (int) (Math.random() * size + 1);
+                rolls[i] = (int) (Math.random() * size + 1);
+                strings[i] = "" + rolls[i];
             }
-            return total;
+            return new Pair(strings, rolls);
         }
 
         @Override
