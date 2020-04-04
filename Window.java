@@ -632,11 +632,6 @@ public class Window extends javax.swing.JFrame {
                     ArrayList<Attack> attackList = new ArrayList();
                     NodeList attacks = s.getElementsByTagName("attack");
                     
-                    NodeList something = s.getChildNodes();
-                    for (int k = 0; k < something.getLength(); k++) {
-                        System.out.println(something.item(k));
-                    }
-                    
                     for (int k = 0; k < attacks.getLength(); k++) {
                         Element attack = (Element) attacks.item(k);
 

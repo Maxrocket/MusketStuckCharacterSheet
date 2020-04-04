@@ -1,6 +1,8 @@
 package musketstuckcharactersheet.dice;
 
+import java.util.ArrayList;
 import javafx.util.Pair;
+import musketstuckcharactersheet.OnRoll;
 
 public class C extends Dice {
 
@@ -11,7 +13,7 @@ public class C extends Dice {
         }
 
         @Override
-        public Pair<String[], int[]> roll() {
+        public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
             return new Pair(new String[]{value + ""}, new int[]{value});
         }
 

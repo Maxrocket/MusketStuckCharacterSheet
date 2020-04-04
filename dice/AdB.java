@@ -1,6 +1,8 @@
 package musketstuckcharactersheet.dice;
 
+import java.util.ArrayList;
 import javafx.util.Pair;
+import musketstuckcharactersheet.OnRoll;
 
 public class AdB extends Dice {
 
@@ -12,14 +14,19 @@ public class AdB extends Dice {
         }
 
         @Override
-        public Pair<String[], int[]> roll() {
-            int[] rolls = new int[count];
-            String[] strings = new String[count];
+        public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
+            Pair<String[], int[]> rolls = new Pair(new String[count], new int[count]);
             for (int i = 0; i < count; i++) {
-                rolls[i] = (int) (Math.random() * size + 1);
-                strings[i] = "" + rolls[i];
+                int roll = (int) (Math.random() * size + 1);
+                rolls.getKey()[i] = roll + "";
+                rolls.getValue()[i] = roll;
             }
-            return new Pair(strings, rolls);
+            
+            for (OnRoll onRoll : onRollArr) {
+                rolls = onRoll.onRoll(rolls, count, size);
+            }
+            
+            return rolls;
         }
 
         @Override
