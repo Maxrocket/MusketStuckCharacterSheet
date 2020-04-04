@@ -21,18 +21,18 @@ public class Die {
         this.ds1 = ds1;
     }
 
-    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
+    public Pair<String, Integer> roll(ArrayList<OnRoll> onRollArr) {
         if (op == -1) {
             Pair<String[], int[]> dp = d.roll(onRollArr);
             return collapseDice(dp.getKey(), dp.getValue());
         } else {
-            Pair<String[], int[]> ds0p = ds0.roll(onRollArr);
-            Pair<String[], int[]> ds1p = ds1.roll(onRollArr);
-            return collapseDie(ds0p.getKey()[0], ds1p.getKey()[0], ds0p.getValue()[0], ds1p.getValue()[0], op);
+            Pair<String, Integer> ds0p = ds0.roll(onRollArr);
+            Pair<String, Integer> ds1p = ds1.roll(onRollArr);
+            return collapseDie(ds0p.getKey(), ds1p.getKey(), ds0p.getValue(), ds1p.getValue(), op);
         }
     }
 
-    private Pair<String[], int[]> collapseDice(String[] ss, int[] is) {
+    private Pair<String, Integer> collapseDice(String[] ss, int[] is) {
         String s = "(";
         for (int i = 0; i < ss.length - 1; i++) {
             s += ss[i] + ",";
@@ -42,10 +42,10 @@ public class Die {
         for (int i : is) {
             total += i;
         }
-        return new Pair(new String[]{s}, new int[]{total});
+        return new Pair(s, total);
     }
 
-    private Pair<String[], int[]> collapseDie(String s0, String s1, int i0, int i1, int op) {
+    private Pair<String, Integer> collapseDie(String s0, String s1, int i0, int i1, int op) {
         String s = "";
         int total = i0;
         switch (op) {
@@ -66,7 +66,7 @@ public class Die {
                 total /= i1;
                 break;
         }
-        return new Pair(new String[]{s}, new int[]{total});
+        return new Pair(s, total);
     }
 
     public String toString() {
