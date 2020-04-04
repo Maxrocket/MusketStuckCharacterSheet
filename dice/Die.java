@@ -1,6 +1,7 @@
 package musketstuckcharactersheet.dice;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import javafx.util.Pair;
 import musketstuckcharactersheet.OnRoll;
 
@@ -10,6 +11,16 @@ public class Die {
     int op = -1; // 0+, 1-, 2*, 3/
     Die ds0 = null;
     Die ds1 = null;
+
+    int rollCount = 1;
+    boolean adv;
+
+    Comparator<Pair<String, Integer>> sorter = new Comparator<Pair<String, Integer>>() {
+        @Override
+        public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
+            return o2.getValue() - o1.getValue();
+        }
+    };
 
     public Die(Dice d) {
         this.d = d;
@@ -22,13 +33,56 @@ public class Die {
     }
 
     public Pair<String, Integer> roll(ArrayList<OnRoll> onRollArr) {
+        ArrayList<Pair<String, Integer>> rolls = new ArrayList<>();
         if (op == -1) {
-            Pair<String[], int[]> dp = d.roll(onRollArr);
-            return collapseDice(dp.getKey(), dp.getValue());
+            //roll
+            for (int i = 0; i < rollCount; i++) {
+                Pair<String[], int[]> dp = d.roll(onRollArr);
+                rolls.add(collapseDice(dp.getKey(), dp.getValue()));
+            }
+            //find selected
+            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>)(rolls.clone());
+            sorted.sort(sorter);
+            Pair<String, Integer> chosen = sorted.get(0);
+            if (!adv){
+                chosen = rolls.get(sorted.size() - 1);
+            }
+            //combine strings
+            String str = "";
+            for (Pair<String, Integer> roll : rolls) {
+                str += roll.getKey();
+            }
+            //isolate selected roll
+            String chose = chosen.getKey();
+            String[] ss = str.split(chose, 2);
+            chose = "{" + chose.substring(1, chose.length()) + "}";
+            //put together and return
+            return new Pair(ss[0] + chose + ss[1], chosen.getValue());
         } else {
-            Pair<String, Integer> ds0p = ds0.roll(onRollArr);
-            Pair<String, Integer> ds1p = ds1.roll(onRollArr);
-            return collapseDie(ds0p.getKey(), ds1p.getKey(), ds0p.getValue(), ds1p.getValue(), op);
+            //roll
+            for (int i = 0; i < rollCount; i++) {
+                Pair<String, Integer> ds0p = ds0.roll(onRollArr);
+                Pair<String, Integer> ds1p = ds1.roll(onRollArr);
+                rolls.add(collapseDie(ds0p.getKey(), ds1p.getKey(), ds0p.getValue(), ds1p.getValue(), op));
+            }
+            //find selected
+            ArrayList<Pair<String, Integer>> sorted = (ArrayList<Pair<String, Integer>>)(rolls.clone());
+            sorted.sort(sorter);
+            Pair<String, Integer> chosen = sorted.get(0);
+            if (!adv){
+                chosen = rolls.get(sorted.size() - 1);
+            }
+            //combine strings
+            String str = "";
+            for (Pair<String, Integer> roll : rolls) {
+                str += "(" + roll.getKey() + ")";
+            }
+            //isolate selected roll
+            String chose = "(" + chosen.getKey() + ")";
+            String[] ss = str.split(chose, 2);
+            chose = "{" + chose.substring(1, chose.length()) + "}";
+            //put together and return
+            return new Pair(ss[0] + chose + ss[1], chosen.getValue());
         }
     }
 
