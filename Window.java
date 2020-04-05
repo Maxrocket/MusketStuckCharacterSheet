@@ -46,6 +46,7 @@ import javax.swing.event.DocumentListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import musketstuckcharactersheet.dice.DiceParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -631,14 +632,13 @@ public class Window extends javax.swing.JFrame {
 
                     ArrayList<Attack> attackList = new ArrayList();
                     NodeList attacks = s.getElementsByTagName("attack");
-                    
+
                     for (int k = 0; k < attacks.getLength(); k++) {
                         Element attack = (Element) attacks.item(k);
 
                         Attack attackItem = new Attack(attack.getElementsByTagName("name").item(0).getTextContent(),
                                 Integer.parseInt(attack.getElementsByTagName("hitBonus").item(0).getTextContent()),
                                 attack.getElementsByTagName("damage").item(0).getTextContent(),
-                                attack.getElementsByTagName("bonusDamage").item(0).getTextContent(),
                                 Integer.parseInt(attack.getElementsByTagName("crit").item(0).getTextContent()),
                                 Integer.parseInt(attack.getElementsByTagName("critMul").item(0).getTextContent()),
                                 attack.getElementsByTagName("ability").item(0).getTextContent());
@@ -796,18 +796,14 @@ public class Window extends javax.swing.JFrame {
             labelRef.get(string).addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Pair<String[], int[]> hitRolls = Dice.roll(1 + Math.abs((int) advSpinner.getValue()), 20, characters.get(characterComboBox.getSelectedItem()).getOnRollFunctions());
-                    int toHit = hitRolls.getValue()[0];
-                    if ((int) advSpinner.getValue() > 0) {
-                        toHit = Dice.advantage(hitRolls.getValue());
-                    }
+                    Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
                     if ((int) advSpinner.getValue() < 0) {
-                        toHit = Dice.disadvantage(hitRolls.getValue());
+                        hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
                     }
-                    int result = toHit + Integer.parseInt(modRef.get(string).getText());
+                    int result = hitRolls.getValue() + Integer.parseInt(modRef.get(string).getText());
 
-                    outputText(string + " Roll: " + Dice.writeDiceResult(hitRolls.getKey()) + "+" + modRef.get(string).getText() + "=" + result + "\n",
-                            string + " Roll: ```" + Dice.writeDiceResult(hitRolls.getKey()) + "+" + modRef.get(string).getText() + "=" + result + "```");
+                    outputText(string + " Roll: " + hitRolls.getKey() + "+" + modRef.get(string).getText() + "=" + result + "\n",
+                            string + " Roll: ```" + hitRolls.getKey() + "+" + modRef.get(string).getText() + "=" + result + "```");
                 }
 
                 public void mousePressed(MouseEvent e) {
@@ -955,19 +951,15 @@ public class Window extends javax.swing.JFrame {
     }
 
     public boolean rollDeathSave(int s) {
-        Pair<String[], int[]> hitRolls = Dice.roll(1 + Math.abs((int) advSpinner.getValue()), 20, characters.get(characterComboBox.getSelectedItem()).getOnRollFunctions());
-        int toHit = hitRolls.getValue()[0];
-        if ((int) advSpinner.getValue() > 0) {
-            toHit = Dice.advantage(hitRolls.getValue());
-        }
+        Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
         if ((int) advSpinner.getValue() < 0) {
-            toHit = Dice.disadvantage(hitRolls.getValue());
+            hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
         }
-        int result = toHit + Integer.parseInt(modRef.get("BOD").getText());
+        int result = hitRolls.getValue() + Integer.parseInt(modRef.get("BOD").getText());
 
         String rollResult = "FAILIURE";
         boolean crit = false;
-        if (toHit == 20) {
+        if (hitRolls.getValue() == 20) {
             rollResult = "CRITICAL SUCCESS, DAMAGE AVOIDED";
             crit = true;
         } else {
@@ -976,8 +968,8 @@ public class Window extends javax.swing.JFrame {
             }
         }
 
-        outputText("Death Save: " + Dice.writeDiceResult(hitRolls.getKey()) + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "\n",
-                "Death Save: ```" + Dice.writeDiceResult(hitRolls.getKey()) + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "```");
+        outputText("Death Save: " + hitRolls.getKey() + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "\n",
+                "Death Save: ```" + hitRolls.getKey() + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "```");
         return crit;
     }
 
@@ -1245,29 +1237,13 @@ public class Window extends javax.swing.JFrame {
                     if (attack.straightDamage) {
                         fw.append("        <direct>\n");
                         fw.append("            <name>" + attack.name + "</name>\n");
-                        fw.append("            <damage>" + attack.dmg.get(0).getKey() + "d" + attack.dmg.get(0).getValue());
-                        for (int i = 1; i < attack.dmg.size(); i++) {
-                            fw.append("+" + attack.dmg.get(i).getKey() + "d" + attack.dmg.get(i).getValue());
-                        }
-                        fw.append("</damage>\n");
+                        fw.append("            <damage>" + attack.dmg + "</damage>\n");
                         fw.append("        </direct>\n");
                     } else {
                         fw.append("        <attack>\n");
                         fw.append("            <name>" + attack.name + "</name>\n");
                         fw.append("            <hitBonus>" + attack.hitBonus + "</hitBonus>\n");
-                        fw.append("            <damage>" + attack.dmg.get(0).getKey() + "d" + attack.dmg.get(0).getValue());
-                        for (int i = 1; i < attack.dmg.size(); i++) {
-                            fw.append("+" + attack.dmg.get(i).getKey() + "d" + attack.dmg.get(i).getValue());
-                        }
-                        fw.append("</damage>\n");
-                        fw.append("            <bonusDamage>");
-                        if (attack.bonusDmg.size() > 0) {
-                            fw.append(attack.bonusDmg.get(0).getKey() + "d" + attack.bonusDmg.get(0).getValue());
-                            for (int i = 1; i < attack.bonusDmg.size(); i++) {
-                                fw.append("+" + attack.bonusDmg.get(i).getKey() + "d" + attack.bonusDmg.get(i).getValue());
-                            }
-                        }
-                        fw.append("</bonusDamage>\n");
+                        fw.append("            <damage>" + attack.dmg + "</damage>\n");
                         fw.append("            <crit>" + attack.crit + "</crit>\n");
                         fw.append("            <critMul>" + attack.critMul + "</critMul>\n");
                         fw.append("            <ability>" + attack.abi + "</ability>\n");

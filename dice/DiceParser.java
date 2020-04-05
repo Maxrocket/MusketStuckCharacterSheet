@@ -3,7 +3,6 @@ package musketstuckcharactersheet.dice;
 public class DiceParser {
 
     public static Die parse(String die) {
-        System.out.println(die);
         die = die.replace(" ", "");
         Die cur = null; //die to be made
         int nextOp = -1; //operation before next die
