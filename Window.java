@@ -836,9 +836,17 @@ public class Window extends javax.swing.JFrame {
                         hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
                     }
                     int result = hitRolls.getValue() + Integer.parseInt(modRef.get(string).getText());
+                    if (proficiencyCheckbox.isSelected()) {
+                        result += Integer.parseInt(profTextField.getText());
+                    }
+                    String output = hitRolls.getKey() + "+" + modRef.get(string).getText();
+                    if (proficiencyCheckbox.isSelected()) {
+                        output += "+" + Integer.parseInt(profTextField.getText());
+                    }
+                    output += "=" + result;
 
-                    outputText(string + " Roll: " + hitRolls.getKey() + "+" + modRef.get(string).getText() + "=" + result + "\n",
-                            string + " Roll: ```" + hitRolls.getKey() + "+" + modRef.get(string).getText() + "=" + result + "```");
+                    outputText(string + " Roll: " + output + "\n",
+                            string + " Roll: ```" + output + "```");
                 }
 
                 public void mousePressed(MouseEvent e) {
@@ -1010,6 +1018,14 @@ public class Window extends javax.swing.JFrame {
             hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
         }
         int result = hitRolls.getValue() + Integer.parseInt(modRef.get("BOD").getText());
+        if (proficiencyCheckbox.isSelected()) {
+            result += Integer.parseInt(profTextField.getText());
+        }
+        String output = hitRolls.getKey() + "+" + modRef.get("BOD").getText();
+        if (proficiencyCheckbox.isSelected()) {
+            output += "+" + Integer.parseInt(profTextField.getText());
+        }
+        output += "=" + result;
 
         String rollResult = "FAILIURE";
         boolean crit = false;
@@ -1022,8 +1038,8 @@ public class Window extends javax.swing.JFrame {
             }
         }
 
-        outputText("Death Save: " + hitRolls.getKey() + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "\n",
-                "Death Save: ```" + hitRolls.getKey() + "+" + modRef.get("BOD").getText() + "=" + result + " " + rollResult + "```");
+        outputText("Death Save: " + output + " " + rollResult + "\n",
+                "Death Save: ```" + output + " " + rollResult + "```");
         return crit;
     }
 
