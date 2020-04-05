@@ -2,7 +2,8 @@ package musketstuckcharactersheet.dice;
 
 public class DiceParser {
 
-    public Die parse(String die) {
+    public static Die parse(String die) {
+        System.out.println(die);
         die = die.replace(" ", "");
         Die cur = null; //die to be made
         int nextOp = -1; //operation before next die
@@ -89,7 +90,7 @@ public class DiceParser {
         return cur;
     }
 
-    public Die updateDie(Die ds0, int op, Die ds1) {
+    public static Die updateDie(Die ds0, int op, Die ds1) {
         if (ds0 == null) {
             return ds1;
         }

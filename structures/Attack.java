@@ -3,14 +3,14 @@ package musketstuckcharactersheet.structures;
 import java.util.ArrayList;
 import javafx.util.Pair;
 import musketstuckcharactersheet.OnRoll;
+import musketstuckcharactersheet.dice.DiceParser;
 
 public class Attack {
 
     public int prof;
     public int hitBonus;
     public int hitAbility;
-    public ArrayList<Pair<Integer, Integer>> dmg;
-    public ArrayList<Pair<Integer, Integer>> bonusDmg;
+    public String dmg;
     public int crit;
     public int critMul;
     public String abi;
@@ -22,26 +22,10 @@ public class Attack {
 
     public boolean straightDamage = false;
 
-    public Attack(String name, int hitBonus, String dmg, String bonusDmg, int crit, int critMul, String abi) {
+    public Attack(String name, int hitBonus, String dmg, int crit, int critMul, String abi) {
         this.name = name;
         this.hitBonus = hitBonus;
-        String[] dmgS = dmg.split("\\+");
-        ArrayList<Pair<Integer, Integer>> dmgDice = new ArrayList();
-        for (String string : dmgS) {
-            String[] dice = string.split("d");
-            dmgDice.add(new Pair(Integer.parseInt(dice[0]), Integer.parseInt(dice[1])));
-        }
-        this.dmg = dmgDice;
-        String[] bdmgS = bonusDmg.split("\\+");
-        ArrayList<Pair<Integer, Integer>> bdmgDice = new ArrayList();
-        if (!bonusDmg.equals("")) {
-            for (String string : bdmgS) {
-                String[] bdice = string.split("d");
-                bdmgDice.add(new Pair(Integer.parseInt(bdice[0]), Integer.parseInt(bdice[1])));
-            }
-        }
-
-        this.bonusDmg = bdmgDice;
+        this.dmg = dmg;
         this.crit = crit;
         this.critMul = critMul;
         this.abi = abi;
@@ -50,13 +34,7 @@ public class Attack {
     public Attack(String name, String dmg) {
         straightDamage = true;
         this.name = name;
-        String[] dmgS = dmg.split("\\+");
-        ArrayList<Pair<Integer, Integer>> dmgDice = new ArrayList();
-        for (String string : dmgS) {
-            String[] dice = string.split("d");
-            dmgDice.add(new Pair(Integer.parseInt(dice[0]), Integer.parseInt(dice[1])));
-        }
-        this.dmg = dmgDice;
+        this.dmg = dmg;
     }
 
     public void addOnRoll(OnRoll r) {
@@ -74,34 +52,21 @@ public class Attack {
     public String attack(int adv, int prf, int abi) {
         String output = "";
         if (straightDamage) {
-            int totalDamage = 0;
-            for (int j = 0; j < dmg.size(); j++) {
-                if (j != 0) {
-                    output += "+";
-                }
-                Pair<Integer, Integer> pair = dmg.get(j);
-                Pair<String[], int[]> damageRolls = Dice.roll(pair.getKey(), pair.getValue(), onRollFunctions);
-                output += Dice.writeDiceResult(damageRolls.getKey());
-                totalDamage += Dice.total(damageRolls.getValue());
-            }
-            output += "=" + totalDamage;
+            Pair<String, Integer> rolls = DiceParser.parse(dmg).roll(onRollFunctions);
+            output += rolls.getKey() + "=" + rolls.getValue();
         } else {
             hitAbility = abi;
             this.prof = prf;
-            Pair<String[], int[]> hitRolls = Dice.roll(1 + Math.abs(adv), 20, onRollFunctions);
-            int toHit = hitRolls.getValue()[0];
-            if (adv > 0) {
-                toHit = Dice.advantage(hitRolls.getValue());
-            }
+            Pair<String, Integer> hitRolls = DiceParser.parse("1d20a" + Math.abs(adv)).roll(onRollFunctions);
             if (adv < 0) {
-                toHit = Dice.disadvantage(hitRolls.getValue());
+                hitRolls = DiceParser.parse("1d20z" + Math.abs(adv)).roll(onRollFunctions);
             }
             boolean isCrit = false;
-            if (toHit >= crit) {
+            if (hitRolls.getValue() >= crit) {
                 isCrit = true;
             }
-            toHit += hitBonus + hitAbility + prof;
-            output = "To Hit: " + Dice.writeDiceResult(hitRolls.getKey()) + "+" + hitBonus + "+" + hitAbility + "+" + prof + "=" + toHit;
+            int toHit = hitRolls.getValue() + hitBonus + hitAbility + prof;
+            output = "To Hit: " + hitRolls.getKey() + "+" + hitBonus + "+" + hitAbility + "+" + prof + "=" + toHit;
             if (isCrit) {
                 output += " CRIT";
             }
@@ -116,32 +81,13 @@ public class Attack {
                 if (i != 0) {
                     output += "+";
                 }
-                for (int j = 0; j < dmg.size(); j++) {
-                    if (j != 0) {
-                        output += "+";
-                    }
-                    Pair<Integer, Integer> pair = dmg.get(j);
-                    Pair<String[], int[]> damageRolls = Dice.roll(pair.getKey(), pair.getValue(), onRollFunctions);
-                    output += Dice.writeDiceResult(damageRolls.getKey());
-                    int damageSum = Dice.total(damageRolls.getValue());
-                    int damageSumAdv = 0;
-                    if (damageAdvantage) {
-                        Pair<String[], int[]> damageRollsAdv = Dice.roll(pair.getKey(), pair.getValue(), onRollFunctions);
-                        output += Dice.writeDiceResult(damageRollsAdv.getKey());
-                        damageSumAdv = Dice.total(damageRollsAdv.getValue());
-                    }
-                    totalDamage += Math.max(damageSum, damageSumAdv);
-                }
-                totalDamage += hitBonus + hitAbility;
-                output += "+" + hitBonus + "+" + hitAbility;
 
-                for (Pair<Integer, Integer> pair : bonusDmg) {
-                    output += "+";
-                    Pair<String[], int[]> damageRolls = Dice.roll(pair.getKey(), pair.getValue(), onRollFunctions);
-                    output += Dice.writeDiceResult(damageRolls.getKey());
-                    int damageSum = Dice.total(damageRolls.getValue());
-                    totalDamage += damageSum;
+                Pair<String, Integer> damageRolls = DiceParser.parse(dmg).roll(onRollFunctions);
+                if (damageAdvantage) {
+                    damageRolls = DiceParser.parse("(" + dmg + ")a1").roll(onRollFunctions);
                 }
+                totalDamage += damageRolls.getValue() + hitAbility;
+                output += damageRolls.getKey() + "+" + hitAbility;
             }
             output += "=" + totalDamage;
         }

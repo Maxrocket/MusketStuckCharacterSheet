@@ -6,30 +6,30 @@ import musketstuckcharactersheet.OnRoll;
 
 public class Dice {
 
-    public static Pair<String[], int[]> roll(int num, int type, ArrayList<OnRoll> onRollFunctions) {
-        Pair<String[], int[]> rolls = new Pair(new String[num], new int[num]);
-        for (int i = 0; i < num; i++) {
-            int roll = (int) Math.ceil(Math.random() * (type + 0.0));
-            rolls.getKey()[i] = roll + "";
-            rolls.getValue()[i] = roll;
-        }
-        for (OnRoll onRollFunction : onRollFunctions) {
-            rolls = onRollFunction.onRoll(rolls, num, type);
-        }
-
-        return rolls;
-    }
-    
-    public static Pair<String[], int[]> roll(int num, int type) {
-        Pair<String[], int[]> rolls = new Pair(new String[num], new int[num]);
-        for (int i = 0; i < num; i++) {
-            int roll = (int) Math.ceil(Math.random() * (type + 0.0));
-            rolls.getKey()[i] = roll + "";
-            rolls.getValue()[i] = roll;
-        }
-
-        return rolls;
-    }
+//    public static Pair<String[], int[]> roll(int num, int type, ArrayList<OnRoll> onRollFunctions) {
+//        Pair<String[], int[]> rolls = new Pair(new String[num], new int[num]);
+//        for (int i = 0; i < num; i++) {
+//            int roll = (int) Math.ceil(Math.random() * (type + 0.0));
+//            rolls.getKey()[i] = roll + "";
+//            rolls.getValue()[i] = roll;
+//        }
+//        for (OnRoll onRollFunction : onRollFunctions) {
+//            rolls = onRollFunction.onRoll(rolls, num, type);
+//        }
+//
+//        return rolls;
+//    }
+//    
+//    public static Pair<String[], int[]> roll(int num, int type) {
+//        Pair<String[], int[]> rolls = new Pair(new String[num], new int[num]);
+//        for (int i = 0; i < num; i++) {
+//            int roll = (int) Math.ceil(Math.random() * (type + 0.0));
+//            rolls.getKey()[i] = roll + "";
+//            rolls.getValue()[i] = roll;
+//        }
+//
+//        return rolls;
+//    }
 
     public static int count(int x, int[] xs) {
         int c = 0;

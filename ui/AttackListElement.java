@@ -24,19 +24,9 @@ public class AttackListElement extends JLabel {
             }
             text += ", ";
         }
-        text += a.dmg.get(0).getKey() + "d" + a.dmg.get(0).getValue();
-        for (int i = 1; i < a.dmg.size(); i++) {
-            text += "+" + a.dmg.get(i).getKey() + "d" + a.dmg.get(i).getValue();
-        }
+        text += a.dmg;
         if (!a.straightDamage) {
-            text += "+" + a.abi;
-            if (a.hitBonus > 0) {
-                text += "+" + a.hitBonus;
-            }
-            for (int i = 0; i < a.bonusDmg.size(); i++) {
-                text += "+" + a.bonusDmg.get(i).getKey() + "d" + a.bonusDmg.get(i).getValue();
-            }
-            text += ", " + a.crit + "/x" + a.critMul;
+            text += "+" + a.abi + ", " + a.crit + "/x" + a.critMul;
         }
         
         text += ", " + a.damageAdvantage;
