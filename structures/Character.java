@@ -1,6 +1,8 @@
 package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javafx.util.Pair;
 import musketstuckcharactersheet.utils.OnRoll;
 
@@ -19,6 +21,8 @@ public class Character {
     public ArrayList<Weapon> weapons;
     
     public static Armour DEFAULT_ARMOUR = new Armour("Default Armour", 0, 20);
+    public static ArrayList<Attack> DEFAULT_ATTACK = new ArrayList<Attack>((List<Attack>)Arrays.asList(new Attack("Punch", 0, "1d4", 20, 2, "BOD")));
+    public static Weapon DEFAULT_WEAPON = new Weapon("Fists", DEFAULT_ATTACK);
 
     public Character(String name, int bod, int dex, int mnd, int mag, int asp, int power, int safety, int knowledge, int aspect, String claspect, String title, int currentHp) {
         this.name = name;

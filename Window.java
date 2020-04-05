@@ -47,6 +47,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import musketstuckcharactersheet.dice.DiceParser;
+import musketstuckcharactersheet.utils.XMLElement;
+import musketstuckcharactersheet.utils.XMLReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -578,89 +580,82 @@ public class Window extends javax.swing.JFrame {
             Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10);
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
+            c.addItem(Character.DEFAULT_WEAPON);
             characterComboBox.addItem(s);
             characters.put(s, c);
             selectedCharacter = s;
             saveCharacter(c);
         } else {
-            Document startup = parseXML("data/startup.xml");
-            startup.getDocumentElement().normalize();
-            NodeList nl = startup.getDocumentElement().getElementsByTagName("character");
-            for (int i = 0; i < nl.getLength(); i++) {
-                Element e = (Element) nl.item(i);
-                characterComboBox.addItem(e.getElementsByTagName("name").item(0).getTextContent());
+            XMLElement startup = XMLReader.readXMLFile("data/startup.xml");
+            for (XMLElement charElement : startup.children.get("character")) {
+                characterComboBox.addItem(charElement.children.get("name").get(0).textContent);
 
-                Document charDoc = parseXML("data/characters/" + e.getElementsByTagName("file").item(0).getTextContent());
-                charDoc.getDocumentElement().normalize();
-                Element s = (Element) charDoc.getDocumentElement();
-                Character character = new Character(s.getElementsByTagName("name").item(0).getTextContent(),
-                        Integer.parseInt(s.getElementsByTagName("bod").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("dex").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("mnd").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("mag").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("asp").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("power").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("safety").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("knowledge").item(0).getTextContent()),
-                        Integer.parseInt(s.getElementsByTagName("aspect").item(0).getTextContent()),
-                        s.getElementsByTagName("claspect").item(0).getTextContent(),
-                        s.getElementsByTagName("title").item(0).getTextContent(),
-                        Integer.parseInt(s.getElementsByTagName("currentHp").item(0).getTextContent()));
+                XMLElement character = XMLReader.readXMLFile("data/characters/" + charElement.children.get("file").get(0).textContent);
+                Character c = new Character(character.children.get("name").get(0).textContent,
+                        Integer.parseInt(character.children.get("bod").get(0).textContent),
+                        Integer.parseInt(character.children.get("dex").get(0).textContent),
+                        Integer.parseInt(character.children.get("mnd").get(0).textContent),
+                        Integer.parseInt(character.children.get("mag").get(0).textContent),
+                        Integer.parseInt(character.children.get("asp").get(0).textContent),
+                        Integer.parseInt(character.children.get("power").get(0).textContent),
+                        Integer.parseInt(character.children.get("safety").get(0).textContent),
+                        Integer.parseInt(character.children.get("knowledge").get(0).textContent),
+                        Integer.parseInt(character.children.get("aspect").get(0).textContent),
+                        character.children.get("claspect").get(0).textContent,
+                        character.children.get("title").get(0).textContent,
+                        Integer.parseInt(character.children.get("currentHp").get(0).textContent));
 
-                NodeList gristCache = s.getElementsByTagName("grist");
-                for (int j = 0; j < gristCache.getLength(); j++) {
-                    Element grist = (Element) gristCache.item(j);
-                    character.addGrist(grist.getElementsByTagName("type").item(0).getTextContent(),
-                            Integer.parseInt(grist.getElementsByTagName("quantity").item(0).getTextContent()));
+                for (XMLElement grist : character.children.get("grist")) {
+                    c.addGrist(grist.children.get("type").get(0).textContent,
+                            Integer.parseInt(grist.children.get("quantity").get(0).textContent));
                 }
 
-                NodeList armours = s.getElementsByTagName("armour");
-                for (int j = 0; j < armours.getLength(); j++) {
-                    Element armour = (Element) armours.item(j);
-                    Armour armourItem = new Armour(armour.getElementsByTagName("name").item(0).getTextContent(),
-                            Integer.parseInt(armour.getElementsByTagName("acBonus").item(0).getTextContent()),
-                            Integer.parseInt(armour.getElementsByTagName("maxDexMod").item(0).getTextContent()));
-                    character.addItem(armourItem);
-                    if (s.getElementsByTagName("equiped").item(0).getTextContent().equals(armour.getElementsByTagName("name").item(0).getTextContent())) {
-                        character.equiped = armourItem;
+                if (character.children.containsKey("armour")) {
+                    for (XMLElement armour : character.children.get("armour")) {
+                        Armour armourItem = new Armour(armour.children.get("name").get(0).textContent,
+                                Integer.parseInt(armour.children.get("acBonus").get(0).textContent),
+                                Integer.parseInt(armour.children.get("maxDexMod").get(0).textContent));
+                        c.addItem(armourItem);
+                        if (character.children.get("equiped").get(0).textContent.equals(armourItem.name)) {
+                            c.equiped = armourItem;
+                        }
                     }
                 }
 
-                NodeList weapons = s.getElementsByTagName("weapon");
-                for (int j = 0; j < weapons.getLength(); j++) {
-                    Element weapon = (Element) weapons.item(j);
+                if (character.children.containsKey("weapon")) {
+                    for (XMLElement weapon : character.children.get("weapon")) {
+                        ArrayList<Attack> attackList = new ArrayList();
 
-                    ArrayList<Attack> attackList = new ArrayList();
-                    NodeList attacks = s.getElementsByTagName("attack");
+                        if (weapon.children.containsKey("attack")) {
+                            for (XMLElement attack : weapon.children.get("attack")) {
+                                Attack attackItem = new Attack(attack.children.get("name").get(0).textContent,
+                                        Integer.parseInt(attack.children.get("hitBonus").get(0).textContent),
+                                        attack.children.get("damage").get(0).textContent,
+                                        Integer.parseInt(attack.children.get("crit").get(0).textContent),
+                                        Integer.parseInt(attack.children.get("critMul").get(0).textContent),
+                                        attack.children.get("ability").get(0).textContent);
+                                attackItem.setDamageAdvantage(true);
+                                attackList.add(attackItem);
+                            }
+                        }
+                        if (weapon.children.containsKey("direct")) {
+                            for (XMLElement attack : weapon.children.get("direct")) {
+                                Attack attackItem = new Attack(attack.children.get("name").get(0).textContent,
+                                        attack.children.get("damage").get(0).textContent);
+                                attackList.add(attackItem);
+                            }
+                        }
 
-                    for (int k = 0; k < attacks.getLength(); k++) {
-                        Element attack = (Element) attacks.item(k);
-
-                        Attack attackItem = new Attack(attack.getElementsByTagName("name").item(0).getTextContent(),
-                                Integer.parseInt(attack.getElementsByTagName("hitBonus").item(0).getTextContent()),
-                                attack.getElementsByTagName("damage").item(0).getTextContent(),
-                                Integer.parseInt(attack.getElementsByTagName("crit").item(0).getTextContent()),
-                                Integer.parseInt(attack.getElementsByTagName("critMul").item(0).getTextContent()),
-                                attack.getElementsByTagName("ability").item(0).getTextContent());
-                        attackItem.setDamageAdvantage(true);
-                        attackList.add(attackItem);
+                        Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent, attackList);
+                        c.addItem(weaponItem);
                     }
-                    NodeList damages = s.getElementsByTagName("direct");
-                    for (int k = 0; k < damages.getLength(); k++) {
-                        Element damage = (Element) damages.item(k);
-
-                        Attack attackItem = new Attack(damage.getElementsByTagName("name").item(0).getTextContent(),
-                                damage.getElementsByTagName("damage").item(0).getTextContent());
-                        attackList.add(attackItem);
-                    }
-
-                    Weapon weaponItem = new Weapon(weapon.getElementsByTagName("name").item(0).getTextContent(), attackList);
-                    character.addItem(weaponItem);
                 }
 
-                characters.put(s.getElementsByTagName("name").item(0).getTextContent(), character);
+                characters.put(c.name, c);
             }
-            selectedCharacter = startup.getDocumentElement().getElementsByTagName("default").item(0).getTextContent();
+
+            selectedCharacter = startup.children.get("default").get(0).textContent;
+
         }
         characterComboBox.setSelectedItem(selectedCharacter);
         loadCharacter(characters.get(selectedCharacter));
@@ -1074,41 +1069,6 @@ public class Window extends javax.swing.JFrame {
 
         }
 
-    }
-
-    public Document parseXML(String filepath) {
-        String fileContent = "";
-        try {
-            FileReader fr = new FileReader(filepath);
-            BufferedReader br = new BufferedReader(fr);
-            String line = br.readLine();
-            fileContent += line;
-            line = br.readLine();
-            while (line != null) {
-                fileContent += "\n" + line;
-                line = br.readLine();
-            }
-            br.close();
-            fr.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Document doc = null;
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            StringBuilder xmlStringBuilder = new StringBuilder();
-            xmlStringBuilder.append(fileContent);
-            ByteArrayInputStream input = new ByteArrayInputStream(xmlStringBuilder.toString().getBytes("UTF-8"));
-            doc = builder.parse(input);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return doc;
     }
 
     public void loadCharacter(Character c) {
