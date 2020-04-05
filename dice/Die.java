@@ -3,7 +3,7 @@ package musketstuckcharactersheet.dice;
 import java.util.ArrayList;
 import java.util.Comparator;
 import javafx.util.Pair;
-import musketstuckcharactersheet.OnRoll;
+import musketstuckcharactersheet.utils.OnRoll;
 
 public class Die {
 

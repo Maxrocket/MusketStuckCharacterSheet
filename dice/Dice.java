@@ -2,7 +2,7 @@ package musketstuckcharactersheet.dice;
 
 import java.util.ArrayList;
 import javafx.util.Pair;
-import musketstuckcharactersheet.OnRoll;
+import musketstuckcharactersheet.utils.OnRoll;
 
 public abstract class Dice {
 

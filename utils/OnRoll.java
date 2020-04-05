@@ -1,4 +1,4 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.utils;
 
 import javafx.util.Pair;
 

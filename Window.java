@@ -1,5 +1,6 @@
 package musketstuckcharactersheet;
 
+import musketstuckcharactersheet.utils.MouseCorrectRobot;
 import musketstuckcharactersheet.ui.WeaponListElement;
 import musketstuckcharactersheet.ui.ArmourListElement;
 import musketstuckcharactersheet.structures.Monster;

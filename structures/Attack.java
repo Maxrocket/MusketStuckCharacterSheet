@@ -2,7 +2,7 @@ package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
 import javafx.util.Pair;
-import musketstuckcharactersheet.OnRoll;
+import musketstuckcharactersheet.utils.OnRoll;
 import musketstuckcharactersheet.dice.DiceParser;
 
 public class Attack {

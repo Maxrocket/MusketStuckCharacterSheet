@@ -1,4 +1,4 @@
-package musketstuckcharactersheet;
+package musketstuckcharactersheet.utils;
 
 import java.awt.AWTException;
 import java.awt.Dimension;
