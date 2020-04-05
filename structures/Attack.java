@@ -57,14 +57,14 @@ public class Attack {
         } else {
             hitAbility = abi;
             this.prof = prf;
-            Pair<String, Integer> hitRolls = DiceParser.parse("1d20a" + Math.abs(adv)).roll(onRollFunctions);
+            Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs(adv)).roll(onRollFunctions);
             if (adv < 0) {
-                hitRolls = DiceParser.parse("1d20z" + Math.abs(adv)).roll(onRollFunctions);
+                hitRolls = DiceParser.parse("(1d20)z" + Math.abs(adv)).roll(onRollFunctions);
             }
             boolean isCrit = false;
             if (hitRolls.getValue() >= crit) {
                 isCrit = true;
-            }
+            }       
             int toHit = hitRolls.getValue() + hitBonus + hitAbility + prof;
             output = "To Hit: " + hitRolls.getKey() + "+" + hitBonus + "+" + hitAbility + "+" + prof + "=" + toHit;
             if (isCrit) {
