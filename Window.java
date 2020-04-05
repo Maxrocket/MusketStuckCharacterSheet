@@ -196,8 +196,6 @@ public class Window extends javax.swing.JFrame {
         deathsaveLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
         characterPanel.add(deathsaveLabel);
         deathsaveLabel.setBounds(460, 145, 80, 30);
-
-        HPTextField.setText("46");
         characterPanel.add(HPTextField);
         HPTextField.setBounds(60, 100, 30, 30);
 
@@ -230,8 +228,6 @@ public class Window extends javax.swing.JFrame {
         bodLabel.setText("BOD: ");
         attributePanel.add(bodLabel);
         bodLabel.setBounds(20, 40, 33, 30);
-
-        bodStatTextField.setText("12");
         attributePanel.add(bodStatTextField);
         bodStatTextField.setBounds(60, 40, 45, 30);
 
@@ -243,8 +239,6 @@ public class Window extends javax.swing.JFrame {
         dexLabel.setText("DEX:");
         attributePanel.add(dexLabel);
         dexLabel.setBounds(20, 80, 28, 30);
-
-        dexStatTextField.setText("18");
         attributePanel.add(dexStatTextField);
         dexStatTextField.setBounds(60, 80, 45, 30);
 
@@ -256,8 +250,6 @@ public class Window extends javax.swing.JFrame {
         mndLabel.setText("MND:");
         attributePanel.add(mndLabel);
         mndLabel.setBounds(20, 120, 31, 30);
-
-        mndStatTextField.setText("12");
         attributePanel.add(mndStatTextField);
         mndStatTextField.setBounds(60, 120, 45, 30);
 
@@ -270,7 +262,6 @@ public class Window extends javax.swing.JFrame {
         attributePanel.add(magLabel);
         magLabel.setBounds(20, 160, 31, 30);
 
-        magStatTextField.setText("8");
         magStatTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 magStatTextFieldActionPerformed(evt);
@@ -287,8 +278,6 @@ public class Window extends javax.swing.JFrame {
         aspLabel.setText("ASP:");
         attributePanel.add(aspLabel);
         aspLabel.setBounds(20, 200, 28, 30);
-
-        aspStatTextField.setText("14");
         attributePanel.add(aspStatTextField);
         aspStatTextField.setBounds(60, 200, 45, 30);
 
@@ -324,16 +313,12 @@ public class Window extends javax.swing.JFrame {
         claspectLabel.setText("Claspect: ");
         characterPanel.add(claspectLabel);
         claspectLabel.setBounds(20, 60, 60, 30);
-
-        claspectTextField.setText("Heir Of Void");
         characterPanel.add(claspectTextField);
         claspectTextField.setBounds(90, 60, 110, 30);
 
         titleLabel.setText("Title:");
         characterPanel.add(titleLabel);
         titleLabel.setBounds(220, 60, 40, 30);
-
-        titleTextField.setText("Heir Of Void");
         characterPanel.add(titleTextField);
         titleTextField.setBounds(270, 60, 155, 30);
 
@@ -348,7 +333,7 @@ public class Window extends javax.swing.JFrame {
         levelPanel.add(powerLabel);
         powerLabel.setBounds(20, 40, 41, 30);
 
-        powerSpinner.setModel(new javax.swing.SpinnerNumberModel(5, 0, null, 1));
+        powerSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         levelPanel.add(powerSpinner);
         powerSpinner.setBounds(100, 40, 45, 30);
 
@@ -356,7 +341,7 @@ public class Window extends javax.swing.JFrame {
         levelPanel.add(knowledgeLabel);
         knowledgeLabel.setBounds(175, 40, 67, 30);
 
-        knowledgeSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 0, null, 1));
+        knowledgeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         levelPanel.add(knowledgeSpinner);
         knowledgeSpinner.setBounds(255, 40, 45, 30);
 
