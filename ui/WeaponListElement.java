@@ -23,7 +23,7 @@ public class WeaponListElement extends JPanel {
         
         int yCount = 20;
         for (Attack attack : weapon.attacks) {
-            AttackListElement element = new AttackListElement(yCount, w, frame, attack);
+            AttackListElement element = new AttackListElement(yCount, w, frame, attack, weapon.type);
             this.add(element);
             yCount += 20;
         }

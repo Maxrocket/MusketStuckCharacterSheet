@@ -7,8 +7,6 @@ package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
-import javafx.util.Pair;
 
 /**
  *
@@ -17,19 +15,20 @@ import javafx.util.Pair;
 public class Weapon extends Item {
     
     public ArrayList<Attack> attacks;
-
-    public Weapon(String name, Optional<ArrayList<Pair<String, Integer>>> recipe, ArrayList<Attack> attacks) {
-        super(name, recipe);
-        this.attacks = attacks;
-    }
+    public String type;
     
-    public Weapon(String name, ArrayList<Attack> attacks) {
+    public Weapon(String name, String type, ArrayList<Attack> attacks) {
         super(name);
         this.attacks = attacks;
+        this.type = type;
     }
 
-    public String attack(int index, int adv, int prof, HashMap<String, Integer> stats) {
+    public String attack(int index, int adv, int prof, HashMap<String, Integer> stats, String weaponProf) {
         int stat = stats.get(attacks.get(index).abi);
+        if (!weaponProf.equals(type)) {
+            prof = 0;
+        }
+        
         String output = attacks.get(index).attack(adv, prof, stat);
 
         return output;

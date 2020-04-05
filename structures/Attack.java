@@ -66,10 +66,19 @@ public class Attack {
                 isCrit = true;
             }       
             int toHit = hitRolls.getValue() + hitBonus + hitAbility + prof;
-            output = "To Hit: " + hitRolls.getKey() + "+" + hitBonus + "+" + hitAbility + "+" + prof + "=" + toHit;
+            
+            output = "To Hit: " + hitRolls.getKey();
+            if (hitBonus != 0) {
+                output += "+" + hitBonus;
+            }
+            output += "+" + hitAbility;
+            if (prof != 0) {
+                output += "+" + prof;
+            }
             if (isCrit) {
                 output += " CRIT";
             }
+            output += "=" + toHit;
 
             output += " - ";
             int hitTimes = 1;

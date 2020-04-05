@@ -13,6 +13,7 @@ public class Character {
     public int power, safety, knowledge, aspect;
     public String claspect, title;
     public int currentHp;
+    public String weaponProf;
     public ArrayList<OnRoll> onRollFunctions;
     public ArrayList<Pair<String, Integer>> gristCache;
     public ArrayList<Item> inventory;
@@ -22,9 +23,9 @@ public class Character {
     
     public static Armour DEFAULT_ARMOUR = new Armour("Default Armour", 0, 20);
     public static ArrayList<Attack> DEFAULT_ATTACK = new ArrayList<Attack>((List<Attack>)Arrays.asList(new Attack("Punch", 0, "1d4", 20, 2, "BOD")));
-    public static Weapon DEFAULT_WEAPON = new Weapon("Fists", DEFAULT_ATTACK);
+    public static Weapon DEFAULT_WEAPON = new Weapon("Fists", "Fist", DEFAULT_ATTACK);
 
-    public Character(String name, int bod, int dex, int mnd, int mag, int asp, int power, int safety, int knowledge, int aspect, String claspect, String title, int currentHp) {
+    public Character(String name, int bod, int dex, int mnd, int mag, int asp, int power, int safety, int knowledge, int aspect, String claspect, String title, int currentHp, String weaponProf) {
         this.name = name;
         this.bod = bod;
         this.dex = dex;
@@ -38,6 +39,7 @@ public class Character {
         this.claspect = claspect;
         this.title = title;
         this.currentHp = currentHp;
+        this.weaponProf = weaponProf;
         onRollFunctions = new ArrayList();
         gristCache = new ArrayList();
         inventory = new ArrayList();

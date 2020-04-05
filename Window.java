@@ -11,6 +11,7 @@ import musketstuckcharactersheet.structures.Character;
 import com.sun.glass.events.KeyEvent;
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -20,22 +21,21 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -43,25 +43,20 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
 import musketstuckcharactersheet.utils.XMLElement;
 import musketstuckcharactersheet.utils.XMLReader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class Window extends javax.swing.JFrame {
 
-    public HashMap<String, Monster> monsters;
     public HashMap<String, JTextField> modRef;
     public HashMap<String, JTextField> statRef;
     public HashMap<String, JLabel> labelRef;
 
     public HashMap<String, Character> characters;
+    public HashMap<String, Monster> monsters;
     public String currentSelection;
     public int currentGrist;
     public ArrayList<ArmourListElement> armourElements;
@@ -113,6 +108,7 @@ public class Window extends javax.swing.JFrame {
         aspStatTextField = new javax.swing.JTextField();
         aspModTextField = new javax.swing.JTextField();
         attributesLabel = new javax.swing.JLabel();
+        proficiencyCheckbox = new javax.swing.JCheckBox();
         characterComboBox = new javax.swing.JComboBox<>();
         newButton = new javax.swing.JButton();
         profLabel = new javax.swing.JLabel();
@@ -143,10 +139,16 @@ public class Window extends javax.swing.JFrame {
         attacksPanel = new javax.swing.JPanel();
         attacksLabel = new javax.swing.JLabel();
         attacksListPanel = new javax.swing.JPanel();
+        proficiencyPanel = new javax.swing.JPanel();
+        weaponProficiencyLabel = new javax.swing.JLabel();
+        weaponKindLabel = new javax.swing.JLabel();
+        weaponProficiencyTextField = new javax.swing.JTextField();
+        skillProficiencyLabel = new javax.swing.JLabel();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        monsterLootTableScrollPane = new javax.swing.JScrollPane();
+        monsterLootTable = new javax.swing.JTable();
+        monsterLootButton = new javax.swing.JButton();
         seperator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -291,8 +293,12 @@ public class Window extends javax.swing.JFrame {
         attributePanel.add(attributesLabel);
         attributesLabel.setBounds(10, 10, 160, 16);
 
+        proficiencyCheckbox.setText("Proficiency");
+        attributePanel.add(proficiencyCheckbox);
+        proficiencyCheckbox.setBounds(20, 240, 140, 25);
+
         characterPanel.add(attributePanel);
-        attributePanel.setBounds(20, 140, 180, 250);
+        attributePanel.setBounds(20, 140, 180, 280);
 
         characterPanel.add(characterComboBox);
         characterComboBox.setBounds(20, 20, 385, 30);
@@ -398,7 +404,7 @@ public class Window extends javax.swing.JFrame {
         newGristButton.setBounds(20, 80, 140, 25);
 
         characterPanel.add(gristCachePanel);
-        gristCachePanel.setBounds(20, 410, 180, 165);
+        gristCachePanel.setBounds(20, 440, 180, 165);
 
         armourPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         armourPanel.setLayout(null);
@@ -450,6 +456,30 @@ public class Window extends javax.swing.JFrame {
         characterPanel.add(attacksPanel);
         attacksPanel.setBounds(220, 415, 320, 50);
 
+        proficiencyPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        proficiencyPanel.setLayout(null);
+
+        weaponProficiencyLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        weaponProficiencyLabel.setText("Weapon Proficiency");
+        proficiencyPanel.add(weaponProficiencyLabel);
+        weaponProficiencyLabel.setBounds(10, 10, 160, 16);
+
+        weaponKindLabel.setText("-kind");
+        proficiencyPanel.add(weaponKindLabel);
+        weaponKindLabel.setBounds(131, 40, 30, 30);
+
+        weaponProficiencyTextField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        proficiencyPanel.add(weaponProficiencyTextField);
+        weaponProficiencyTextField.setBounds(20, 40, 110, 30);
+
+        skillProficiencyLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        skillProficiencyLabel.setText("Skill Proficiencies");
+        proficiencyPanel.add(skillProficiencyLabel);
+        skillProficiencyLabel.setBounds(10, 90, 160, 16);
+
+        characterPanel.add(proficiencyPanel);
+        proficiencyPanel.setBounds(20, 625, 180, 200);
+
         characterScrollPane.setViewportView(characterPanel);
 
         mainTabPane.addTab("Character Sheet", characterScrollPane);
@@ -460,12 +490,9 @@ public class Window extends javax.swing.JFrame {
         lootRollerPanel.setPreferredSize(new java.awt.Dimension(560, 1000));
         lootRollerPanel.setLayout(null);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        monsterLootTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Name", "Loot", "Quantity"
@@ -486,10 +513,20 @@ public class Window extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        monsterLootTable.setRowHeight(30);
+        monsterLootTableScrollPane.setViewportView(monsterLootTable);
 
-        lootRollerPanel.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 10, 540, 270);
+        lootRollerPanel.add(monsterLootTableScrollPane);
+        monsterLootTableScrollPane.setBounds(10, 10, 540, 270);
+
+        monsterLootButton.setText("Roll Loot");
+        monsterLootButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                monsterLootButtonActionPerformed(evt);
+            }
+        });
+        lootRollerPanel.add(monsterLootButton);
+        monsterLootButton.setBounds(429, 290, 120, 25);
 
         lootRollerScrollPane.setViewportView(lootRollerPanel);
 
@@ -552,17 +589,14 @@ public class Window extends javax.swing.JFrame {
                 FileWriter fw = new FileWriter("data/startup.xml");
                 fw.write("<main>\n");
                 fw.append("    <default>" + s + "</default>\n");
-                fw.append("    <character>\n");
-                fw.append("        <name>" + s + "</name>\n");
-                fw.append("        <file>" + s.toLowerCase() + ".xml</file>\n");
-                fw.append("    </character>\n");
+                fw.append("    <character>" + s.toLowerCase() + ".xml</character>\n");
                 fw.append("</main>");
                 fw.flush();
                 fw.close();
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10);
+            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10, "");
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
             c.addItem(Character.DEFAULT_WEAPON);
@@ -573,9 +607,11 @@ public class Window extends javax.swing.JFrame {
         } else {
             XMLElement startup = XMLReader.readXMLFile("data/startup.xml");
             for (XMLElement charElement : startup.children.get("character")) {
-                characterComboBox.addItem(charElement.children.get("name").get(0).textContent);
 
-                XMLElement character = XMLReader.readXMLFile("data/characters/" + charElement.children.get("file").get(0).textContent);
+                XMLElement character = XMLReader.readXMLFile("data/characters/" + charElement.textContent);
+
+                characterComboBox.addItem(character.children.get("name").get(0).textContent);
+
                 Character c = new Character(character.children.get("name").get(0).textContent,
                         Integer.parseInt(character.children.get("bod").get(0).textContent),
                         Integer.parseInt(character.children.get("dex").get(0).textContent),
@@ -588,7 +624,8 @@ public class Window extends javax.swing.JFrame {
                         Integer.parseInt(character.children.get("aspect").get(0).textContent),
                         character.children.get("claspect").get(0).textContent,
                         character.children.get("title").get(0).textContent,
-                        Integer.parseInt(character.children.get("currentHp").get(0).textContent));
+                        Integer.parseInt(character.children.get("currentHp").get(0).textContent),
+                        character.children.get("weaponProf").get(0).textContent);
 
                 for (XMLElement grist : character.children.get("grist")) {
                     c.addGrist(grist.children.get("type").get(0).textContent,
@@ -613,30 +650,48 @@ public class Window extends javax.swing.JFrame {
 
                         if (weapon.children.containsKey("attack")) {
                             for (XMLElement attack : weapon.children.get("attack")) {
-                                Attack attackItem = new Attack(attack.children.get("name").get(0).textContent,
-                                        Integer.parseInt(attack.children.get("hitBonus").get(0).textContent),
-                                        attack.children.get("damage").get(0).textContent,
-                                        Integer.parseInt(attack.children.get("crit").get(0).textContent),
-                                        Integer.parseInt(attack.children.get("critMul").get(0).textContent),
-                                        attack.children.get("ability").get(0).textContent);
+                                Attack attackItem;
+                                if (attack.children.containsKey("hitBonus")) {
+                                    attackItem = new Attack(attack.children.get("name").get(0).textContent,
+                                            Integer.parseInt(attack.children.get("hitBonus").get(0).textContent),
+                                            attack.children.get("damage").get(0).textContent,
+                                            Integer.parseInt(attack.children.get("crit").get(0).textContent),
+                                            Integer.parseInt(attack.children.get("critMul").get(0).textContent),
+                                            attack.children.get("ability").get(0).textContent);
+                                } else {
+                                    attackItem = new Attack(attack.children.get("name").get(0).textContent,
+                                            attack.children.get("damage").get(0).textContent);
+                                }
                                 attackItem.setDamageAdvantage(true);
                                 attackList.add(attackItem);
                             }
                         }
-                        if (weapon.children.containsKey("direct")) {
-                            for (XMLElement attack : weapon.children.get("direct")) {
-                                Attack attackItem = new Attack(attack.children.get("name").get(0).textContent,
-                                        attack.children.get("damage").get(0).textContent);
-                                attackList.add(attackItem);
-                            }
-                        }
 
-                        Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent, attackList);
+                        Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent,
+                                weapon.children.get("type").get(0).textContent, attackList);
                         c.addItem(weaponItem);
                     }
                 }
 
                 characters.put(c.name, c);
+            }
+
+            monsters = new HashMap();
+
+            if (startup.children.containsKey("monster")) {
+                for (XMLElement monElement : startup.children.get("monster")) {
+
+                    XMLElement monster = XMLReader.readXMLFile("data/monsters/" + monElement.textContent);
+
+                    Monster m = new Monster(monster.children.get("name").get(0).textContent);
+
+                    for (XMLElement grist : monster.children.get("grist")) {
+                        m.addLoot(grist.children.get("type").get(0).textContent, grist.children.get("quantity").get(0).textContent);
+                    }
+
+                    monsters.put(monster.children.get("name").get(0).textContent, m);
+
+                }
             }
 
             selectedCharacter = startup.children.get("default").get(0).textContent;
@@ -824,27 +879,28 @@ public class Window extends javax.swing.JFrame {
             }
         });
 
-        monsters = new HashMap();
-
-        Monster imp = new Monster("Imp");
-        imp.addLoot("Build Grist", "1d10");
-        imp.addLoot("Abstraction Grist", "1d10");
-        monsters.put("Imp", imp);
-        Monster orc = new Monster("Orc");
-        orc.addLoot("Build Grist", "2d20");
-        orc.addLoot("Abstraction Grist", "2d20");
-        orc.addLoot("Shale", "1d5");
-        monsters.put("Orc", orc);
-        Monster ogre = new Monster("Ogre");
-        ogre.addLoot("Build Grist", "20d12");
-        ogre.addLoot("Abstraction Grist", "20d12");
-        ogre.addLoot("Shale", "10d6");
-        ogre.addLoot("Rubies", "1d10");
-        monsters.put("Ogre", ogre);
-
-//        for (String string : weapons.keySet()) {
-//            weaponSelect.addItem(string);
-//        }
+        TableCellRenderer buttonRenderer = new JTableButtonRenderer();
+        monsterLootTable.getColumn("Loot").setCellRenderer(buttonRenderer);
+        DefaultTableModel model = (DefaultTableModel) monsterLootTable.getModel();
+        for (Monster monster : monsters.values()) {
+            JButton displayLoot = new JButton("Show Loot");
+            model.addRow(new Object[]{monster.name, displayLoot, 0});
+        }
+        monsterLootTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = monsterLootTable.rowAtPoint(evt.getPoint());
+                int col = monsterLootTable.columnAtPoint(evt.getPoint());
+                if (col == 1) {
+                    String monsterName = (String) monsterLootTable.getValueAt(row, 0);
+                    String lootString = monsterName + " Loot:";
+                    for (Entry<String, String> grist : monsters.get(monsterName).loot.entrySet()) {
+                        lootString += "\n" + grist.getKey() + ": " + grist.getValue();
+                    }
+                    JOptionPane.showMessageDialog(null, lootString, "Monster Loot", JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+        });
 
     }//GEN-LAST:event_formWindowOpened
 
@@ -859,10 +915,10 @@ public class Window extends javax.swing.JFrame {
             fw.write("<main>\n");
             fw.append("    <default>" + currentSelection + "</default>\n");
             for (Character value : characters.values()) {
-                fw.append("    <character>\n");
-                fw.append("        <name>" + value.name + "</name>\n");
-                fw.append("        <file>" + value.name.toLowerCase() + ".xml</file>\n");
-                fw.append("    </character>\n");
+                fw.append("    <character>" + value.name.toLowerCase() + ".xml</character>\n");
+            }
+            for (Monster value : monsters.values()) {
+                fw.append("    <monster>" + value.name.toLowerCase() + ".xml</monster>\n");
             }
             fw.append("</main>");
             fw.flush();
@@ -883,7 +939,7 @@ public class Window extends javax.swing.JFrame {
         if (found) {
             JOptionPane.showMessageDialog(this, "This name already exists.", "Input required", JOptionPane.ERROR_MESSAGE);
         } else {
-            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10);
+            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10, "");
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
             characterComboBox.addItem(s);
@@ -925,6 +981,24 @@ public class Window extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_hpLabelMouseClicked
+
+    private void monsterLootButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monsterLootButtonActionPerformed
+        HashMap<String, Integer> totalLoot = new HashMap();
+        for (int i = 0; i < monsterLootTable.getRowCount(); i++) {
+            for (Entry<String, String> grist : monsters.get(monsterLootTable.getValueAt(i, 0)).loot.entrySet()) {
+                if (totalLoot.containsKey(grist.getKey())) {
+                    int loot = totalLoot.get(grist.getKey()) + (int) DiceParser.parse("(" + grist.getValue() + ") * " + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue();
+                    totalLoot.remove(grist.getKey());
+                    totalLoot.put(grist.getKey(), loot);
+                } else {
+                    totalLoot.put(grist.getKey(), (int) DiceParser.parse("(" + grist.getValue() + ") * " + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue());
+                }
+            }
+        }
+        for (Entry<String, Integer> entry : totalLoot.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }//GEN-LAST:event_monsterLootButtonActionPerformed
 
     public void rollDeathSave() {
         rollDeathSave(0);
@@ -1072,6 +1146,7 @@ public class Window extends javax.swing.JFrame {
         titleTextField.setText(c.title);
 
         HPTextField.setText(c.currentHp + "");
+        weaponProficiencyTextField.setText(c.weaponProf + "");
 
         gristCacheComboBox.removeAllItems();
         ArrayList<String> names = new ArrayList();
@@ -1132,6 +1207,7 @@ public class Window extends javax.swing.JFrame {
             c.title = titleTextField.getText();
 
             c.currentHp = Integer.parseInt(HPTextField.getText());
+            c.weaponProf = weaponProficiencyTextField.getText();
 
             String gristName = c.gristCache.get(currentGrist).getKey();
             c.gristCache.remove(currentGrist);
@@ -1161,6 +1237,7 @@ public class Window extends javax.swing.JFrame {
             fw.append("    <claspect>" + c.claspect + "</claspect>\n");
             fw.append("    <title>" + c.title + "</title>\n");
             fw.append("    <currentHp>" + c.currentHp + "</currentHp>\n");
+            fw.append("    <weaponProf>" + c.weaponProf + "</weaponProf>\n");
             for (Pair<String, Integer> p : c.gristCache) {
                 fw.append("    <grist>\n");
                 fw.append("        <type>" + p.getKey() + "</type>\n");
@@ -1178,12 +1255,13 @@ public class Window extends javax.swing.JFrame {
             for (Weapon weapon : c.weapons) {
                 fw.append("    <weapon>\n");
                 fw.append("        <name>" + weapon.name + "</name>\n");
+                fw.append("        <type>" + weapon.type + "</type>\n");
                 for (Attack attack : weapon.attacks) {
                     if (attack.straightDamage) {
-                        fw.append("        <direct>\n");
+                        fw.append("        <attack>\n");
                         fw.append("            <name>" + attack.name + "</name>\n");
                         fw.append("            <damage>" + attack.dmg + "</damage>\n");
-                        fw.append("        </direct>\n");
+                        fw.append("        </attack>\n");
                     } else {
                         fw.append("        <attack>\n");
                         fw.append("            <name>" + attack.name + "</name>\n");
@@ -1192,7 +1270,6 @@ public class Window extends javax.swing.JFrame {
                         fw.append("            <crit>" + attack.crit + "</crit>\n");
                         fw.append("            <critMul>" + attack.critMul + "</critMul>\n");
                         fw.append("            <ability>" + attack.abi + "</ability>\n");
-
                         fw.append("        </attack>\n");
                     }
                 }
@@ -1290,6 +1367,16 @@ public class Window extends javax.swing.JFrame {
         }
     }
 
+    private static class JTableButtonRenderer implements TableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JButton button = (JButton) value;
+            return button;
+        }
+
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField HPTextField;
@@ -1328,8 +1415,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JSpinner gristCacheSpinner;
     private javax.swing.JLabel hpDividerLabel;
     private javax.swing.JLabel hpLabel;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel knowledgeLabel;
     private javax.swing.JSpinner knowledgeSpinner;
     private javax.swing.JLabel levelLabel;
@@ -1346,6 +1431,9 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel mndLabel;
     private javax.swing.JTextField mndModTextField;
     private javax.swing.JTextField mndStatTextField;
+    private javax.swing.JButton monsterLootButton;
+    private javax.swing.JTable monsterLootTable;
+    private javax.swing.JScrollPane monsterLootTableScrollPane;
     private javax.swing.JButton newButton;
     private javax.swing.JButton newGristButton;
     private javax.swing.JCheckBox outputCheckbox;
@@ -1355,11 +1443,17 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JSpinner powerSpinner;
     private javax.swing.JLabel profLabel;
     private javax.swing.JTextField profTextField;
+    private javax.swing.JCheckBox proficiencyCheckbox;
+    private javax.swing.JPanel proficiencyPanel;
     private javax.swing.JLabel safetyLabel;
     private javax.swing.JSpinner safetySpinner;
     private javax.swing.JSeparator seperator1;
+    private javax.swing.JLabel skillProficiencyLabel;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JTextField totalHPTextField;
+    private javax.swing.JLabel weaponKindLabel;
+    private javax.swing.JLabel weaponProficiencyLabel;
+    private javax.swing.JTextField weaponProficiencyTextField;
     // End of variables declaration//GEN-END:variables
 }

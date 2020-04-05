@@ -10,10 +10,12 @@ public class AttackListElement extends JLabel {
 
     public Window frame;
     public Attack a;
+    public String type;
 
-    public AttackListElement(int y, int w, Window frame, Attack a) {
+    public AttackListElement(int y, int w, Window frame, Attack a, String type) {
         this.a = a;
         this.frame = frame;
+        this.type = type;
         this.setLayout(null);
 
         String text = a.name + ": ";
@@ -29,8 +31,6 @@ public class AttackListElement extends JLabel {
             text += "+" + a.abi + ", " + a.crit + "/x" + a.critMul;
         }
         
-        text += ", " + a.damageAdvantage;
-        
         this.setText(text);
         this.setSize(w, 20);
         this.setLocation(0, y);
@@ -41,7 +41,11 @@ public class AttackListElement extends JLabel {
                     String output = a.attack(0, 0, 0);
                     frame.outputText(output + "\n", a.name + " Attack\n```" + output + "```");
                 } else {
-                    String output = a.attack((int) frame.advantage.getValue(), Integer.parseInt(frame.prof.getText()), Integer.parseInt(frame.modRef.get(a.abi).getText()));
+                    int prof = Integer.parseInt(frame.prof.getText());
+                    if (!type.equals(frame.characters.get(frame.currentSelection).weaponProf)) {
+                        prof = 0;
+                    }
+                    String output = a.attack((int) frame.advantage.getValue(), prof, Integer.parseInt(frame.modRef.get(a.abi).getText()));
                     frame.outputText(output + "\n", a.name + " Attack\n```" + output + "```");
                 }
             }
