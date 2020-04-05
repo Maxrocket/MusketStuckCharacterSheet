@@ -175,9 +175,6 @@
                   </Constraints>
                 </Component>
                 <Component class="javax.swing.JTextField" name="HPTextField">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="46"/>
-                  </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="60" y="100" width="30" height="30"/>
@@ -266,9 +263,6 @@
                       </Constraints>
                     </Component>
                     <Component class="javax.swing.JTextField" name="bodStatTextField">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="12"/>
-                      </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                           <AbsoluteConstraints x="60" y="40" width="45" height="30"/>
@@ -297,9 +291,6 @@
                       </Constraints>
                     </Component>
                     <Component class="javax.swing.JTextField" name="dexStatTextField">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="18"/>
-                      </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                           <AbsoluteConstraints x="60" y="80" width="45" height="30"/>
@@ -328,9 +319,6 @@
                       </Constraints>
                     </Component>
                     <Component class="javax.swing.JTextField" name="mndStatTextField">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="12"/>
-                      </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                           <AbsoluteConstraints x="60" y="120" width="45" height="30"/>
@@ -359,9 +347,6 @@
                       </Constraints>
                     </Component>
                     <Component class="javax.swing.JTextField" name="magStatTextField">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="8"/>
-                      </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="magStatTextFieldActionPerformed"/>
                       </Events>
@@ -393,9 +378,6 @@
                       </Constraints>
                     </Component>
                     <Component class="javax.swing.JTextField" name="aspStatTextField">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="14"/>
-                      </Properties>
                       <Constraints>
                         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                           <AbsoluteConstraints x="60" y="200" width="45" height="30"/>
@@ -475,9 +457,6 @@
                   </Constraints>
                 </Component>
                 <Component class="javax.swing.JTextField" name="claspectTextField">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Heir Of Void"/>
-                  </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="90" y="60" width="110" height="30"/>
@@ -495,9 +474,6 @@
                   </Constraints>
                 </Component>
                 <Component class="javax.swing.JTextField" name="titleTextField">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Heir Of Void"/>
-                  </Properties>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="270" y="60" width="155" height="30"/>
@@ -545,7 +521,7 @@
                     <Component class="javax.swing.JSpinner" name="powerSpinner">
                       <Properties>
                         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                          <SpinnerModel initial="5" minimum="0" numberType="java.lang.Integer" stepSize="1" type="number"/>
+                          <SpinnerModel initial="0" minimum="0" numberType="java.lang.Integer" stepSize="1" type="number"/>
                         </Property>
                       </Properties>
                       <Constraints>
@@ -567,7 +543,7 @@
                     <Component class="javax.swing.JSpinner" name="knowledgeSpinner">
                       <Properties>
                         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-                          <SpinnerModel initial="1" minimum="0" numberType="java.lang.Integer" stepSize="1" type="number"/>
+                          <SpinnerModel initial="0" minimum="0" numberType="java.lang.Integer" stepSize="1" type="number"/>
                         </Property>
                       </Properties>
                       <Constraints>
