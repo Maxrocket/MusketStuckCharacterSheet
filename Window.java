@@ -7,7 +7,6 @@ import musketstuckcharactersheet.structures.Armour;
 import musketstuckcharactersheet.structures.Weapon;
 import musketstuckcharactersheet.structures.Attack;
 import musketstuckcharactersheet.structures.Character;
-import musketstuckcharactersheet.structures.Dice;
 import com.sun.glass.events.KeyEvent;
 import java.awt.AWTException;
 import java.awt.Color;
