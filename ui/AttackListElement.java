@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.event.MouseInputListener;
 import musketstuckcharactersheet.Window;
+import musketstuckcharactersheet.utils.Output;
 
 public class AttackListElement extends JLabel {
 
@@ -39,14 +40,14 @@ public class AttackListElement extends JLabel {
             public void mouseClicked(MouseEvent e) {
                 if (a.straightDamage) {
                     String output = a.attack(0, 0, 0);
-                    frame.outputText(output + "\n", a.name + " Attack\n```" + output + "```");
+                    Output.outputText(a.name + " Attack", output, frame);
                 } else {
                     int prof = Integer.parseInt(frame.prof.getText());
                     if (!type.equals(frame.characters.get(frame.currentSelection).weaponProf)) {
                         prof = 0;
                     }
                     String output = a.attack((int) frame.advantage.getValue(), prof, Integer.parseInt(frame.modRef.get(a.abi).getText()));
-                    frame.outputText(output + "\n", a.name + " Attack\n```" + output + "```");
+                    Output.outputText(a.name + " Attack", output, frame);
                 }
             }
 

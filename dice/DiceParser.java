@@ -34,6 +34,26 @@ public class DiceParser {
                     int adv = Integer.parseInt(advCount);
                     bracketDie.adv = advantage; //set advantage/disadvantage
                     bracketDie.rollCount = adv + 1; //set rolls
+                } else if (die.charAt(0) == 'r') {
+                    die = die.substring(1);
+                    String repCount = "";
+                    while (die.charAt(0) > 47 && die.charAt(0) < 58) { //get advantage count
+                        repCount += die.charAt(0);
+                        die = die.substring(1);
+                        if (die.length() == 0) {
+                            die = " ";
+                        }
+                    }
+                    int rep = Integer.parseInt(repCount);
+                    if (rep > 0){
+                        Die finalDie = bracketDie;
+                        for (int i = 0; i < rep - 1; i++) {
+                            finalDie = new Die(bracketDie, 0, finalDie);
+                        }
+                        bracketDie = finalDie;
+                    } else {
+                        bracketDie = new Die(new C(0));
+                    }
                 }
                 cur = updateDie(cur, nextOp, bracketDie); //parse inside of brackets
             } else {

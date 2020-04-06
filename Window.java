@@ -1,6 +1,5 @@
 package musketstuckcharactersheet;
 
-import musketstuckcharactersheet.utils.MouseCorrectRobot;
 import musketstuckcharactersheet.ui.WeaponListElement;
 import musketstuckcharactersheet.ui.ArmourListElement;
 import musketstuckcharactersheet.structures.Monster;
@@ -8,15 +7,9 @@ import musketstuckcharactersheet.structures.Armour;
 import musketstuckcharactersheet.structures.Weapon;
 import musketstuckcharactersheet.structures.Attack;
 import musketstuckcharactersheet.structures.Character;
-import com.sun.glass.events.KeyEvent;
-import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Clipboard;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -31,11 +24,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -46,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
+import musketstuckcharactersheet.utils.Output;
 import musketstuckcharactersheet.utils.XMLElement;
 import musketstuckcharactersheet.utils.XMLReader;
 
@@ -65,6 +61,9 @@ public class Window extends javax.swing.JFrame {
     public JCanvas healthBar;
     public JSpinner advantage;
     public JTextField prof;
+    public JCheckBox discord;
+    public JTextArea area;
+    public Window window;
 
     public Window() {
         initComponents();
@@ -576,6 +575,9 @@ public class Window extends javax.swing.JFrame {
         File tmpDir = new File("data/startup.xml");
         advantage = advSpinner;
         prof = profTextField;
+        discord = outputCheckbox;
+        area = outputTextArea;
+        window = this;
 
         characters = new HashMap();
         String selectedCharacter;
@@ -845,8 +847,7 @@ public class Window extends javax.swing.JFrame {
                     }
                     output += "=" + result;
 
-                    outputText(string + " Roll: " + output + "\n",
-                            string + " Roll: ```" + output + "```");
+                    Output.outputText(string + " Roll", output, window);
                 }
 
                 public void mousePressed(MouseEvent e) {
@@ -994,18 +995,53 @@ public class Window extends javax.swing.JFrame {
         HashMap<String, Integer> totalLoot = new HashMap();
         for (int i = 0; i < monsterLootTable.getRowCount(); i++) {
             for (Entry<String, String> grist : monsters.get(monsterLootTable.getValueAt(i, 0)).loot.entrySet()) {
+                int loot = (int) DiceParser.parse("(" + grist.getValue() + ")r" + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue();
                 if (totalLoot.containsKey(grist.getKey())) {
-                    int loot = totalLoot.get(grist.getKey()) + (int) DiceParser.parse("(" + grist.getValue() + ") * " + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue();
+                    loot += totalLoot.get(grist.getKey());
                     totalLoot.remove(grist.getKey());
                     totalLoot.put(grist.getKey(), loot);
-                } else {
-                    totalLoot.put(grist.getKey(), (int) DiceParser.parse("(" + grist.getValue() + ") * " + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue());
+                } else if (loot > 0) {
+                    totalLoot.put(grist.getKey(), (int) DiceParser.parse("(" + grist.getValue() + ")r" + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue());
                 }
             }
         }
+        int count = 0;
         for (Entry<String, Integer> entry : totalLoot.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+            if (entry.getValue() > 0) {
+                count++;
+            }
         }
+        String[] titles = new String[count];
+        String[] messages = new String[count];
+        int i = 0;
+        for (Entry<String, Integer> entry : totalLoot.entrySet()) {
+            if (entry.getValue() > 0) {
+                titles[i] = entry.getKey();
+                messages[i] = entry.getValue() + "";
+                i++;
+            }
+        }
+        Output.outputText(titles, messages, window);
+        int n = JOptionPane.showConfirmDialog(this, "Would you like to add this grist to the current cache?", "Input required", JOptionPane.YES_NO_OPTION);
+        if (n == 0) {
+            mainTabPane.setSelectedIndex(0);
+            for (Entry<String, Integer> entry : totalLoot.entrySet()) {
+                boolean found = false;
+                for (int j = 0; j < characters.get(currentSelection).gristCache.size(); j++) {
+                    Pair<String, Integer> pair = characters.get(currentSelection).gristCache.get(j);
+                    if (pair.getKey().equals(entry.getKey())) {
+                        found = true;
+                        characters.get(currentSelection).gristCache.remove(j);
+                        characters.get(currentSelection).gristCache.add(j, new Pair(pair.getKey(), pair.getValue() + entry.getValue()));
+                    }
+                }
+                if (!found) {
+                    characters.get(entry.getKey()).gristCache.add(new Pair(entry.getKey(), entry.getValue()));
+                }
+            }
+            gristCacheSpinner.setValue(characters.get(currentSelection).gristCache.get(currentGrist).getValue());
+        }
+
     }//GEN-LAST:event_monsterLootButtonActionPerformed
 
     public void rollDeathSave() {
@@ -1038,56 +1074,8 @@ public class Window extends javax.swing.JFrame {
             }
         }
 
-        outputText("Death Save: " + output + " " + rollResult + "\n",
-                "Death Save: ```" + output + " " + rollResult + "```");
+        Output.outputText("Death Save", output + " " + rollResult, window);
         return crit;
-    }
-
-    public void outputText(String text, String discord) {
-        if (outputCheckbox.isSelected()) {
-            try {
-                MouseCorrectRobot r = new MouseCorrectRobot();
-
-                r.keyPress(KeyEvent.VK_ALT);
-                r.keyPress(KeyEvent.VK_TAB);
-                r.delay(50);
-                r.keyRelease(KeyEvent.VK_ALT);
-                r.keyRelease(KeyEvent.VK_TAB);
-                r.MoveMouseControlled(0, 0);
-                r.MoveMouseControlled(0.25, 0.9);
-                int mask1 = InputEvent.getMaskForButton(1);
-                r.mousePress(mask1);
-                r.delay(50);
-                r.mouseRelease(mask1);
-                r.delay(50);
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection stringSelection = new StringSelection(discord);
-                clipboard.setContents(stringSelection, stringSelection);
-                r.delay(50);
-
-                r.keyPress(KeyEvent.VK_CONTROL);
-                r.keyPress(KeyEvent.VK_V);
-                r.delay(50);
-                r.keyRelease(KeyEvent.VK_V);
-                r.keyRelease(KeyEvent.VK_CONTROL);
-                r.delay(50);
-                r.keyPress(KeyEvent.VK_ENTER);
-                r.delay(50);
-                r.keyRelease(KeyEvent.VK_ENTER);
-                r.delay(50);
-                r.keyPress(KeyEvent.VK_ALT);
-                r.keyPress(KeyEvent.VK_TAB);
-                r.keyRelease(KeyEvent.VK_ALT);
-                r.keyRelease(KeyEvent.VK_TAB);
-
-            } catch (AWTException ex) {
-                Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            outputTextArea.append(text);
-            outputTextArea.append("------------------------------\n");
-        }
     }
 
     public void refresh() {
