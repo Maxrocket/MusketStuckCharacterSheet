@@ -32,15 +32,15 @@ public class Die {
         this.ds1 = ds1;
     }
 
-    public Pair<String, Integer> roll(ArrayList<OnRoll> onRollArr) {
+    public Pair<String, Integer> roll(ArrayList<OnRoll> onRollArr, OnRoll.Trigger trigger) {
         ArrayList<Pair<String, Integer>> rolls = new ArrayList<>();
         if (op == -1) {
             if (d instanceof C) {
-                return new Pair(d.roll(onRollArr).getKey()[0], d.roll(onRollArr).getValue()[0]);
+                return new Pair(d.roll(onRollArr, trigger).getKey()[0], d.roll(onRollArr, trigger).getValue()[0]);
             }
             //roll
             for (int i = 0; i < rollCount; i++) {
-                Pair<String[], int[]> dp = d.roll(onRollArr);
+                Pair<String[], int[]> dp = d.roll(onRollArr, trigger);
                 rolls.add(collapseDice(dp.getKey(), dp.getValue()));
             }
             //find selected
@@ -68,8 +68,8 @@ public class Die {
         } else {
             //roll
             for (int i = 0; i < rollCount; i++) {
-                Pair<String, Integer> ds0p = ds0.roll(onRollArr);
-                Pair<String, Integer> ds1p = ds1.roll(onRollArr);
+                Pair<String, Integer> ds0p = ds0.roll(onRollArr, trigger);
+                Pair<String, Integer> ds1p = ds1.roll(onRollArr, trigger);
                 rolls.add(collapseDie(ds0p.getKey(), ds1p.getKey(), ds0p.getValue(), ds1p.getValue(), op));
             }
             //find selected

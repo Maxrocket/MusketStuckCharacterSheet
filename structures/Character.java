@@ -2,6 +2,7 @@ package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import javafx.util.Pair;
 import musketstuckcharactersheet.utils.OnRoll;
@@ -14,7 +15,7 @@ public class Character {
     public String claspect, title;
     public int currentHp;
     public String weaponProf;
-    public ArrayList<OnRoll> onRollFunctions;
+    public HashMap<String, OnRoll> onRollFunctions;
     public ArrayList<Pair<String, Integer>> gristCache;
     public ArrayList<Item> inventory;
     public Armour equiped;
@@ -41,7 +42,7 @@ public class Character {
         this.title = title;
         this.currentHp = currentHp;
         this.weaponProf = weaponProf;
-        onRollFunctions = new ArrayList();
+        onRollFunctions = new HashMap();
         gristCache = new ArrayList();
         inventory = new ArrayList();
         armourpodes = new ArrayList();
@@ -50,12 +51,12 @@ public class Character {
         skillProficiencies = new ArrayList();
     }
 
-    public void addOnRoll(OnRoll r) {
-        onRollFunctions.add(r);
+    public void addOnRoll(String name, OnRoll r) {
+        onRollFunctions.put(name, r);
     }
 
     public ArrayList<OnRoll> getOnRollFunctions() {
-        return onRollFunctions;
+        return new ArrayList<OnRoll>(onRollFunctions.values());
     }
 
     public void addGrist(String type, int quantity) {

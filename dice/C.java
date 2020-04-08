@@ -13,7 +13,7 @@ public class C extends Dice {
     }
 
     @Override
-    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
+    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr, OnRoll.Trigger trigger) {
         return new Pair(new String[]{value + ""}, new int[]{value});
     }
 

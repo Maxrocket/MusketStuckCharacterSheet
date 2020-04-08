@@ -52,14 +52,14 @@ public class Attack {
     public String attack(int adv, int prf, int abi) {
         String output = "";
         if (straightDamage) {
-            Pair<String, Integer> rolls = DiceParser.parse(dmg).roll(onRollFunctions);
+            Pair<String, Integer> rolls = DiceParser.parse(dmg).roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
             output += rolls.getKey() + "=" + rolls.getValue();
         } else {
             hitAbility = abi;
             this.prof = prf;
-            Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs(adv)).roll(onRollFunctions);
+            Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs(adv)).roll(onRollFunctions, OnRoll.Trigger.ATTACK);
             if (adv < 0) {
-                hitRolls = DiceParser.parse("(1d20)z" + Math.abs(adv)).roll(onRollFunctions);
+                hitRolls = DiceParser.parse("(1d20)z" + Math.abs(adv)).roll(onRollFunctions, OnRoll.Trigger.ATTACK);
             }
             boolean isCrit = false;
             if (hitRolls.getValue() >= crit) {
@@ -75,10 +75,11 @@ public class Attack {
             if (prof != 0) {
                 output += "+" + prof;
             }
+            output += "=" + toHit;
+            
             if (isCrit) {
                 output += " CRIT";
             }
-            output += "=" + toHit;
 
             output += " - ";
             int hitTimes = 1;
@@ -91,9 +92,9 @@ public class Attack {
                     output += "+";
                 }
 
-                Pair<String, Integer> damageRolls = DiceParser.parse(dmg).roll(onRollFunctions);
+                Pair<String, Integer> damageRolls = DiceParser.parse(dmg).roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
                 if (damageAdvantage) {
-                    damageRolls = DiceParser.parse("(" + dmg + ")a1").roll(onRollFunctions);
+                    damageRolls = DiceParser.parse("(" + dmg + ")a1").roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
                 }
                 totalDamage += damageRolls.getValue() + hitAbility;
                 output += damageRolls.getKey() + "+" + hitAbility;

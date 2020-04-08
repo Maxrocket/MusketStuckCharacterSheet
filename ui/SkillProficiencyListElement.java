@@ -8,12 +8,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import musketstuckcharactersheet.Window;
 import musketstuckcharactersheet.dice.DiceParser;
+import musketstuckcharactersheet.utils.OnRoll;
 import musketstuckcharactersheet.utils.Output;
 
 public class SkillProficiencyListElement extends JLabel {
 
     public Window window;
     public String text;
+
+    public ArrayList<OnRoll> onRollFunctions = new ArrayList();
 
     public SkillProficiencyListElement(int y, Window window, String text) {
         this.window = window;
@@ -34,9 +37,9 @@ public class SkillProficiencyListElement extends JLabel {
                         possibilities,
                         "BOD");
 
-                Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) window.advantage.getValue())).roll(new ArrayList());
+                Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) window.advantage.getValue())).roll(onRollFunctions, OnRoll.Trigger.ABILITY);
                 if ((int) window.advantage.getValue() < 0) {
-                    hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) window.advantage.getValue())).roll(new ArrayList());
+                    hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) window.advantage.getValue())).roll(onRollFunctions, OnRoll.Trigger.ABILITY);
                 }
                 int result = hitRolls.getValue() + Integer.parseInt(window.modRef.get(s).getText()) + Integer.parseInt(window.prof.getText());
                 
@@ -61,6 +64,10 @@ public class SkillProficiencyListElement extends JLabel {
 
             }
         });
+    }
+
+    public void addOnRoll(ArrayList<OnRoll> rs) {
+        onRollFunctions.addAll(rs);
     }
 
 }

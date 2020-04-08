@@ -14,7 +14,7 @@ public class AdB extends Dice {
     }
 
     @Override
-    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr) {
+    public Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr, OnRoll.Trigger trigger) {
         Pair<String[], int[]> rolls = new Pair(new String[count], new int[count]);
         for (int i = 0; i < count; i++) {
             int roll = (int) (Math.random() * size + 1);
@@ -23,7 +23,15 @@ public class AdB extends Dice {
         }
 
         for (OnRoll onRoll : onRollArr) {
-            rolls = onRoll.onRoll(rolls, count, size);
+            boolean isTrigger = false;
+            for (OnRoll.Trigger t : onRoll.triggers) {
+                if (t == trigger) {
+                    isTrigger = true;
+                }
+            }
+            if (isTrigger) {
+                rolls = onRoll.onRoll(rolls, count, size);
+            }
         }
 
         return rolls;

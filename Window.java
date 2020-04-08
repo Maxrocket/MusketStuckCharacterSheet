@@ -19,6 +19,8 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -43,7 +45,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
+import musketstuckcharactersheet.onRollFunctions.DoubleOnes;
 import musketstuckcharactersheet.ui.SkillProficiencyListElement;
+import musketstuckcharactersheet.utils.OnRoll;
 import musketstuckcharactersheet.utils.Output;
 import musketstuckcharactersheet.utils.XMLElement;
 import musketstuckcharactersheet.utils.XMLReader;
@@ -269,12 +273,6 @@ public class Window extends javax.swing.JFrame {
         magLabel.setText("MAG:");
         attributePanel.add(magLabel);
         magLabel.setBounds(20, 160, 31, 30);
-
-        magStatTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                magStatTextFieldActionPerformed(evt);
-            }
-        });
         attributePanel.add(magStatTextField);
         magStatTextField.setBounds(60, 160, 45, 30);
 
@@ -681,6 +679,29 @@ public class Window extends javax.swing.JFrame {
                     }
                 }
 
+                if (character.children.containsKey("skillProf")) {
+                    for (XMLElement skill : character.children.get("skillProf")) {
+                        c.skillProficiencies.add(skill.textContent);
+                    }
+                }
+
+                if (character.children.containsKey("onRoll")) {
+                    for (XMLElement onRoll : character.children.get("onRoll")) {
+
+                        try {
+                            Class onRollClass = Class.forName("musketstuckcharactersheet.onRollFunctions." + onRoll.textContent);
+                            Class[] types = {};
+                            Constructor constructor = onRollClass.getConstructor(types);
+                            Object[] parameters = {};
+                            OnRoll onRollInstance = (OnRoll) constructor.newInstance(parameters);
+
+                            c.addOnRoll(onRoll.textContent, onRollInstance);
+                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
                 if (character.children.containsKey("weapon")) {
                     for (XMLElement weapon : character.children.get("weapon")) {
                         ArrayList<Attack> attackList = new ArrayList();
@@ -700,6 +721,7 @@ public class Window extends javax.swing.JFrame {
                                             attack.children.get("damage").get(0).textContent);
                                 }
                                 attackItem.setDamageAdvantage(true);
+                                attackItem.addOnRoll(c.getOnRollFunctions());
                                 attackList.add(attackItem);
                             }
                         }
@@ -707,12 +729,6 @@ public class Window extends javax.swing.JFrame {
                         Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent,
                                 weapon.children.get("type").get(0).textContent, attackList);
                         c.addItem(weaponItem);
-                    }
-                }
-
-                if (character.children.containsKey("skillProf")) {
-                    for (XMLElement skill : character.children.get("skillProf")) {
-                        c.skillProficiencies.add(skill.textContent);
                     }
                 }
 
@@ -767,44 +783,6 @@ public class Window extends javax.swing.JFrame {
         healthBar = new JCanvas(155, 105, 385, 20, this);
         characterPanel.add(healthBar);
 
-        /*
-        OnRoll doubleOnes = new OnRoll() {
-            @Override
-            public Pair<String[], int[]> onRoll(Pair<String[], int[]> rolls, int num, int type) {
-                while (Dice.count(1, rolls.getValue()) >= 2) {
-                    for (int i = 0; i < num; i++) {
-                        if (rolls.getValue()[i] == 1) {
-                            rolls.getValue()[i] = type;
-                            rolls.getKey()[i] = rolls.getKey()[i] + " [" + type + "]";
-                            break;
-                        }
-                    }
-                    for (int i = 0; i < num; i++) {
-                        if (rolls.getValue()[i] == 1) {
-                            rolls.getValue()[i] = type;
-                            rolls.getKey()[i] = rolls.getKey()[i] + " [" + type + "]";
-                            break;
-                        }
-                    }
-                }
-                if (Dice.count(1, rolls.getValue()) == 1) {
-                    for (int i = 0; i < num; i++) {
-                        if (rolls.getValue()[i] == 1) {
-                            int d6 = (int) Math.ceil(Math.random() * 6.0);
-                            if (d6 == 1) {
-                                rolls.getValue()[i] = type;
-                                rolls.getKey()[i] = rolls.getKey()[i] + " (" + d6 + ")[" + type + "]";
-                            } else {
-                                rolls.getKey()[i] = rolls.getKey()[i] + " (" + d6 + ")";
-                            }
-                            break;
-                        }
-                    }
-                }
-                return rolls;
-            }
-        };
-        characters.get("Doot").addOnRoll(doubleOnes); */
         modRef = new HashMap();
         modRef.put("BOD", bodModTextField);
         modRef.put("DEX", dexModTextField);
@@ -874,9 +852,9 @@ public class Window extends javax.swing.JFrame {
             labelRef.get(string).addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
+                    Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.ABILITY);
                     if ((int) advSpinner.getValue() < 0) {
-                        hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
+                        hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.ABILITY);
                     }
                     int result = hitRolls.getValue() + Integer.parseInt(modRef.get(string).getText());
                     if (proficiencyCheckbox.isSelected()) {
@@ -970,7 +948,7 @@ public class Window extends javax.swing.JFrame {
                         }
                         input = input.replace("PROF", profTextField.getText());
 
-                        Pair<String, Integer> output = DiceParser.parse(input).roll(new ArrayList<>());
+                        Pair<String, Integer> output = DiceParser.parse(input).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.ROLL);
 
                         Output.outputText("Dice Roll", output.getKey() + "=" + output.getValue(), window);
                         diceRollerTextField.setText("");
@@ -982,10 +960,6 @@ public class Window extends javax.swing.JFrame {
         });
 
     }//GEN-LAST:event_formWindowOpened
-
-    private void magStatTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_magStatTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_magStatTextFieldActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         save(characters.get(currentSelection));
@@ -1065,13 +1039,13 @@ public class Window extends javax.swing.JFrame {
         HashMap<String, Integer> totalLoot = new HashMap();
         for (int i = 0; i < monsterLootTable.getRowCount(); i++) {
             for (Entry<String, String> grist : monsters.get(monsterLootTable.getValueAt(i, 0)).loot.entrySet()) {
-                int loot = (int) DiceParser.parse("(" + grist.getValue() + ")r" + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue();
+                int loot = (int) DiceParser.parse("(" + grist.getValue() + ")r" + monsterLootTable.getValueAt(i, 2)).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.LOOT).getValue();
                 if (totalLoot.containsKey(grist.getKey())) {
                     loot += totalLoot.get(grist.getKey());
                     totalLoot.remove(grist.getKey());
                     totalLoot.put(grist.getKey(), loot);
                 } else if (loot > 0) {
-                    totalLoot.put(grist.getKey(), (int) DiceParser.parse("(" + grist.getValue() + ")r" + monsterLootTable.getValueAt(i, 2)).roll(new ArrayList()).getValue());
+                    totalLoot.put(grist.getKey(), loot);
                 }
             }
         }
@@ -1127,9 +1101,9 @@ public class Window extends javax.swing.JFrame {
     }
 
     public boolean rollDeathSave(int s) {
-        Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
+        Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) advSpinner.getValue())).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.SAVE);
         if ((int) advSpinner.getValue() < 0) {
-            hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(new ArrayList());
+            hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.SAVE);
         }
         int result = hitRolls.getValue() + Integer.parseInt(modRef.get("BOD").getText());
         if (proficiencyCheckbox.isSelected()) {
@@ -1275,6 +1249,7 @@ public class Window extends javax.swing.JFrame {
         skillProficienciesPanel.removeAll();
         for (String skillProficiency : c.skillProficiencies) {
             SkillProficiencyListElement skillLabel = new SkillProficiencyListElement(yCount, this, skillProficiency);
+            skillLabel.addOnRoll(c.getOnRollFunctions());
             skillProficienciesPanel.add(skillLabel);
             yCount += 20;
         }
@@ -1372,6 +1347,9 @@ public class Window extends javax.swing.JFrame {
                     }
                 }
                 fw.append("    </weapon>\n");
+            }
+            for (String string : c.onRollFunctions.keySet()) {
+                fw.append("    <onRoll>" + string + "</onRoll>\n");
             }
             fw.append("</character>");
             fw.flush();

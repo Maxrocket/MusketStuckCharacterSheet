@@ -6,7 +6,7 @@ import musketstuckcharactersheet.utils.OnRoll;
 
 public abstract class Dice {
 
-    public abstract Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr);
+    public abstract Pair<String[], int[]> roll(ArrayList<OnRoll> onRollArr, OnRoll.Trigger trigger);
 
     public abstract String toString();
 
