@@ -41,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
+import musketstuckcharactersheet.ui.SkillProficiencyListElement;
 import musketstuckcharactersheet.utils.Output;
 import musketstuckcharactersheet.utils.XMLElement;
 import musketstuckcharactersheet.utils.XMLReader;
@@ -143,6 +144,8 @@ public class Window extends javax.swing.JFrame {
         weaponKindLabel = new javax.swing.JLabel();
         weaponProficiencyTextField = new javax.swing.JTextField();
         skillProficiencyLabel = new javax.swing.JLabel();
+        skillProficienciesPanel = new javax.swing.JPanel();
+        skillProfButton = new javax.swing.JButton();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
         monsterLootTableScrollPane = new javax.swing.JScrollPane();
@@ -287,6 +290,7 @@ public class Window extends javax.swing.JFrame {
         attributePanel.add(aspModTextField);
         aspModTextField.setBounds(115, 200, 45, 30);
 
+        attributesLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         attributesLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         attributesLabel.setText("Attributes");
         attributePanel.add(attributesLabel);
@@ -366,6 +370,7 @@ public class Window extends javax.swing.JFrame {
         levelPanel.add(safetySpinner);
         safetySpinner.setBounds(100, 80, 45, 30);
 
+        levelsLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         levelsLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         levelsLabel.setText("Levels");
         levelPanel.add(levelsLabel);
@@ -381,6 +386,7 @@ public class Window extends javax.swing.JFrame {
         gristCachePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         gristCachePanel.setLayout(null);
 
+        gristCacheLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         gristCacheLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gristCacheLabel.setText("Grist Cache");
         gristCachePanel.add(gristCacheLabel);
@@ -408,6 +414,7 @@ public class Window extends javax.swing.JFrame {
         armourPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         armourPanel.setLayout(null);
 
+        armourLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         armourLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         armourLabel.setText("Armour");
         armourPanel.add(armourLabel);
@@ -433,6 +440,7 @@ public class Window extends javax.swing.JFrame {
         attacksPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         attacksPanel.setLayout(null);
 
+        attacksLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         attacksLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         attacksLabel.setText("Attacks");
         attacksPanel.add(attacksLabel);
@@ -458,6 +466,7 @@ public class Window extends javax.swing.JFrame {
         proficiencyPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         proficiencyPanel.setLayout(null);
 
+        weaponProficiencyLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         weaponProficiencyLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         weaponProficiencyLabel.setText("Weapon Proficiency");
         proficiencyPanel.add(weaponProficiencyLabel);
@@ -471,13 +480,27 @@ public class Window extends javax.swing.JFrame {
         proficiencyPanel.add(weaponProficiencyTextField);
         weaponProficiencyTextField.setBounds(20, 40, 110, 30);
 
+        skillProficiencyLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         skillProficiencyLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         skillProficiencyLabel.setText("Skill Proficiencies");
         proficiencyPanel.add(skillProficiencyLabel);
         skillProficiencyLabel.setBounds(10, 90, 160, 16);
 
+        skillProficienciesPanel.setLayout(null);
+        proficiencyPanel.add(skillProficienciesPanel);
+        skillProficienciesPanel.setBounds(20, 120, 140, 0);
+
+        skillProfButton.setText("Add New Prof");
+        skillProfButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                skillProfButtonActionPerformed(evt);
+            }
+        });
+        proficiencyPanel.add(skillProfButton);
+        skillProfButton.setBounds(20, 140, 140, 25);
+
         characterPanel.add(proficiencyPanel);
-        proficiencyPanel.setBounds(20, 625, 180, 200);
+        proficiencyPanel.setBounds(20, 625, 180, 180);
 
         characterScrollPane.setViewportView(characterPanel);
 
@@ -672,6 +695,12 @@ public class Window extends javax.swing.JFrame {
                         Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent,
                                 weapon.children.get("type").get(0).textContent, attackList);
                         c.addItem(weaponItem);
+                    }
+                }
+
+                if (character.children.containsKey("skillProf")) {
+                    for (XMLElement skill : character.children.get("skillProf")) {
+                        c.skillProficiencies.add(skill.textContent);
                     }
                 }
 
@@ -1044,6 +1073,14 @@ public class Window extends javax.swing.JFrame {
 
     }//GEN-LAST:event_monsterLootButtonActionPerformed
 
+    private void skillProfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_skillProfButtonActionPerformed
+        String s = (String) JOptionPane.showInputDialog(this, "Enter new skill proficiency name:", "Input required", JOptionPane.PLAIN_MESSAGE, null, null, "");
+
+        characters.get(currentSelection).skillProficiencies.add(s);
+        save(characters.get(currentSelection));
+        loadCharacter(characters.get(currentSelection));
+    }//GEN-LAST:event_skillProfButtonActionPerformed
+
     public void rollDeathSave() {
         rollDeathSave(0);
     }
@@ -1168,6 +1205,7 @@ public class Window extends javax.swing.JFrame {
         int size = c.armourpodes.size();
         armourPanel.setSize(320, 50 + size * 50);
         armourListPanel.setSize(280, size * 50);
+        armourListPanel.removeAll();
         for (int i = 0; i < c.armourpodes.size(); i++) {
             boolean equiped = false;
             if (c.armourpodes.get(i).name.equals(c.equiped.name)) {
@@ -1181,6 +1219,7 @@ public class Window extends javax.swing.JFrame {
         attackElements = new ArrayList();
         attacksPanel.setLocation(220, armourPanel.getY() + armourPanel.getHeight() + 20);
         int yCount = 0;
+        attacksListPanel.removeAll();
         for (int i = 0; i < c.weapons.size(); i++) {
             yCount += 10;
             WeaponListElement element = new WeaponListElement(yCount, 280, this, c.weapons.get(i));
@@ -1190,6 +1229,17 @@ public class Window extends javax.swing.JFrame {
         }
         attacksListPanel.setSize(280, yCount);
         attacksPanel.setSize(320, 50 + yCount);
+
+        yCount = 0;
+        skillProficienciesPanel.removeAll();
+        for (String skillProficiency : c.skillProficiencies) {
+            SkillProficiencyListElement skillLabel = new SkillProficiencyListElement(yCount, this, skillProficiency);
+            skillProficienciesPanel.add(skillLabel);
+            yCount += 20;
+        }
+        skillProficienciesPanel.setSize(140, yCount);
+        proficiencyPanel.setSize(180, 180 + yCount);
+        skillProfButton.setLocation(20, 140 + yCount);
 
         refresh();
     }
@@ -1242,6 +1292,9 @@ public class Window extends javax.swing.JFrame {
             fw.append("    <title>" + c.title + "</title>\n");
             fw.append("    <currentHp>" + c.currentHp + "</currentHp>\n");
             fw.append("    <weaponProf>" + c.weaponProf + "</weaponProf>\n");
+            for (String skillProficiency : c.skillProficiencies) {
+                fw.append("    <skillProf>" + skillProficiency + "</skillProf>\n");
+            }
             for (Pair<String, Integer> p : c.gristCache) {
                 fw.append("    <grist>\n");
                 fw.append("        <type>" + p.getKey() + "</type>\n");
@@ -1452,6 +1505,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel safetyLabel;
     private javax.swing.JSpinner safetySpinner;
     private javax.swing.JSeparator seperator1;
+    private javax.swing.JButton skillProfButton;
+    private javax.swing.JPanel skillProficienciesPanel;
     private javax.swing.JLabel skillProficiencyLabel;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
