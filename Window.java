@@ -12,6 +12,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -152,6 +154,8 @@ public class Window extends javax.swing.JFrame {
         monsterLootTable = new javax.swing.JTable();
         monsterLootButton = new javax.swing.JButton();
         seperator1 = new javax.swing.JSeparator();
+        jLabel1 = new javax.swing.JLabel();
+        diceRollerTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Homestuck Character Sheet");
@@ -215,16 +219,16 @@ public class Window extends javax.swing.JFrame {
         profTextField.setEditable(false);
         profTextField.setText("auto");
         characterPanel.add(profTextField);
-        profTextField.setBounds(295, 145, 45, 30);
+        profTextField.setBounds(305, 145, 45, 30);
 
         acLabel.setText("AC:");
         characterPanel.add(acLabel);
-        acLabel.setBounds(360, 145, 21, 30);
+        acLabel.setBounds(370, 145, 21, 30);
 
         acTextField.setEditable(false);
         acTextField.setText("auto");
         characterPanel.add(acTextField);
-        acTextField.setBounds(390, 145, 45, 30);
+        acTextField.setBounds(400, 145, 45, 30);
 
         attributePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         attributePanel.setLayout(null);
@@ -315,9 +319,9 @@ public class Window extends javax.swing.JFrame {
         characterPanel.add(newButton);
         newButton.setBounds(485, 20, 57, 30);
 
-        profLabel.setText("Prof Bonus:");
+        profLabel.setText("PROF Bonus:");
         characterPanel.add(profLabel);
-        profLabel.setBounds(220, 145, 70, 30);
+        profLabel.setBounds(220, 145, 80, 30);
 
         claspectLabel.setText("Claspect: ");
         characterPanel.add(claspectLabel);
@@ -554,6 +558,8 @@ public class Window extends javax.swing.JFrame {
 
         mainTabPane.addTab("Loot Roller", lootRollerScrollPane);
 
+        jLabel1.setText("Dice Roller: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -564,7 +570,11 @@ public class Window extends javax.swing.JFrame {
                     .addComponent(outputScrollPane)
                     .addComponent(mainTabPane)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(7, 7, 7)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(outputCheckbox)
                         .addGap(42, 42, 42)
                         .addComponent(advLabel)
@@ -581,11 +591,13 @@ public class Window extends javax.swing.JFrame {
                 .addComponent(mainTabPane, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(seperator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addGap(7, 7, 7)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(outputCheckbox)
                     .addComponent(advLabel)
-                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(9, 9, 9)
                 .addComponent(outputScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -936,6 +948,35 @@ public class Window extends javax.swing.JFrame {
                         lootString += "\n" + grist.getKey() + ": " + grist.getValue();
                     }
                     JOptionPane.showMessageDialog(null, lootString, "Monster Loot", JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+        });
+
+        diceRollerTextField.addKeyListener(new KeyListener() {
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    try {
+                        String input = diceRollerTextField.getText();
+                        for (Entry<String, JTextField> entry : modRef.entrySet()) {
+                            input = input.replace(entry.getKey(), entry.getValue().getText());
+                        }
+                        input = input.replace("PROF", profTextField.getText());
+
+                        Pair<String, Integer> output = DiceParser.parse(input).roll(new ArrayList<>());
+
+                        Output.outputText("Dice Roll", output.getKey() + "=" + output.getValue(), window);
+                        diceRollerTextField.setText("");
+                    } catch (Exception x) {
+                        Output.outputText("Dice Roll", "Parsing Error Occured", window);
+                    }
                 }
             }
         });
@@ -1466,12 +1507,14 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel dexLabel;
     private javax.swing.JTextField dexModTextField;
     private javax.swing.JTextField dexStatTextField;
+    private javax.swing.JTextField diceRollerTextField;
     private javax.swing.JComboBox<String> gristCacheComboBox;
     private javax.swing.JLabel gristCacheLabel;
     private javax.swing.JPanel gristCachePanel;
     private javax.swing.JSpinner gristCacheSpinner;
     private javax.swing.JLabel hpDividerLabel;
     private javax.swing.JLabel hpLabel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel knowledgeLabel;
     private javax.swing.JSpinner knowledgeSpinner;
     private javax.swing.JLabel levelLabel;
