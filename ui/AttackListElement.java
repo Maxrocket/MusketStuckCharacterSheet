@@ -29,9 +29,13 @@ public class AttackListElement extends JLabel {
         }
         text += a.dmg;
         if (!a.straightDamage) {
-            text += "+" + a.abi + ", " + a.crit + "/x" + a.critMul;
+            text += "+" + a.abi;
+            if (a.damageAdvantage) {
+                text += " ADV";
+            } 
+            text += ", " + a.crit + "/x" + a.critMul;
         }
-        
+
         this.setText(text);
         this.setSize(w, 20);
         this.setLocation(0, y);

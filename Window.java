@@ -9,6 +9,7 @@ import musketstuckcharactersheet.structures.Attack;
 import musketstuckcharactersheet.structures.Character;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -162,7 +163,7 @@ public class Window extends javax.swing.JFrame {
         monsterLootTable = new javax.swing.JTable();
         monsterLootButton = new javax.swing.JButton();
         seperator1 = new javax.swing.JSeparator();
-        jLabel1 = new javax.swing.JLabel();
+        diceRollerLabel = new javax.swing.JLabel();
         diceRollerTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -180,7 +181,10 @@ public class Window extends javax.swing.JFrame {
 
         advLabel.setText("Adv:");
 
+        outputScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
         outputTextArea.setColumns(20);
+        outputTextArea.setLineWrap(true);
         outputTextArea.setRows(5);
         outputTextArea.setWrapStyleWord(true);
         outputScrollPane.setViewportView(outputTextArea);
@@ -586,7 +590,7 @@ public class Window extends javax.swing.JFrame {
 
         mainTabPane.addTab("Loot Roller", lootRollerScrollPane);
 
-        jLabel1.setText("Dice Roller: ");
+        diceRollerLabel.setText("Dice Roller: ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -599,7 +603,7 @@ public class Window extends javax.swing.JFrame {
                     .addComponent(mainTabPane)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(7, 7, 7)
-                        .addComponent(jLabel1)
+                        .addComponent(diceRollerLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -620,12 +624,13 @@ public class Window extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(seperator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(outputCheckbox)
-                    .addComponent(advLabel)
-                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(diceRollerLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(outputCheckbox)
+                        .addComponent(advLabel)
+                        .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(9, 9, 9)
                 .addComponent(outputScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -746,11 +751,17 @@ public class Window extends javax.swing.JFrame {
                                             Integer.parseInt(attack.children.get("crit").get(0).textContent),
                                             Integer.parseInt(attack.children.get("critMul").get(0).textContent),
                                             attack.children.get("ability").get(0).textContent);
+                                    if (attack.children.containsKey("bonus")) {
+                                        for (XMLElement bonus : attack.children.get("bonus")) {
+                                            if (bonus.textContent.equals("damageAdvantage")) {
+                                                attackItem.setDamageAdvantage(true);
+                                            }
+                                        }
+                                    }
                                 } else {
                                     attackItem = new Attack(attack.children.get("name").get(0).textContent,
                                             attack.children.get("damage").get(0).textContent);
                                 }
-                                attackItem.setDamageAdvantage(true);
                                 attackItem.addOnRoll(c.getOnRollFunctions());
                                 attackList.add(attackItem);
                             }
@@ -1033,6 +1044,7 @@ public class Window extends javax.swing.JFrame {
             Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10, "");
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
+            c.addItem(Character.DEFAULT_WEAPON);
             characterComboBox.addItem(s);
             characters.put(s, c);
         }
@@ -1294,7 +1306,7 @@ public class Window extends javax.swing.JFrame {
         skillProficienciesPanel.setSize(140, yCount);
         proficiencyPanel.setSize(180, 180 + yCount);
         skillProfButton.setLocation(20, 140 + yCount);
-        
+
         techniquePanel.setLocation(220, 385 + armourPanel.getHeight() + attacksPanel.getHeight());
         yCount = 5;
         for (String[] technique : c.techniques) {
@@ -1304,6 +1316,9 @@ public class Window extends javax.swing.JFrame {
         }
         techniqueListPanel.setSize(280, yCount);
         techniquePanel.setSize(320, 50 + yCount);
+        
+        Dimension d = new Dimension(560, Math.max(proficiencyPanel.getY() + proficiencyPanel.getHeight() + 20, techniquePanel.getY() + techniquePanel.getHeight() + 20));
+        characterPanel.setPreferredSize(d);
 
         refresh();
     }
@@ -1391,6 +1406,9 @@ public class Window extends javax.swing.JFrame {
                         fw.append("            <crit>" + attack.crit + "</crit>\n");
                         fw.append("            <critMul>" + attack.critMul + "</critMul>\n");
                         fw.append("            <ability>" + attack.abi + "</ability>\n");
+                        if (attack.damageAdvantage) {
+                            fw.append("            <bonus>damageAdvantage</bonus>\n");
+                        }
                         fw.append("        </attack>\n");
                     }
                 }
@@ -1483,7 +1501,7 @@ public class Window extends javax.swing.JFrame {
 
             g.setColor(Color.white);
             g.fillRect(0, 0, getWidth(), getHeight());
-            
+
             try {
                 int width = (int) (getWidth() * ((Integer.parseInt(HPTextField.getText()) + 0.0) / (Integer.parseInt(totalHPTextField.getText()) + 0.0)));
                 g.setColor(Color.red);
@@ -1494,10 +1512,12 @@ public class Window extends javax.swing.JFrame {
             } catch (Exception e) {
 
             }
-            
+
             g.setColor(Color.GRAY);
-            for (int i = 1; i <= Integer.parseInt(totalHPTextField.getText() + 1); i++) {
-                g.drawLine((getWidth() / Integer.parseInt(totalHPTextField.getText())) * i, 0, (getWidth() / Integer.parseInt(totalHPTextField.getText())) * i, getHeight());
+            double segment = (getWidth() + 0.0) / (Integer.parseInt(totalHPTextField.getText()) + 0.0);
+            int segmentSize = (Integer.parseInt(totalHPTextField.getText()) / 50) + 1;
+            for (int i = segmentSize; i < Integer.parseInt(totalHPTextField.getText()); i = i + segmentSize) {
+                g.drawLine((int) (segment * i), 0, (int) (segment * i), getHeight());
             }
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
@@ -1545,6 +1565,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel dexLabel;
     private javax.swing.JTextField dexModTextField;
     private javax.swing.JTextField dexStatTextField;
+    private javax.swing.JLabel diceRollerLabel;
     private javax.swing.JTextField diceRollerTextField;
     private javax.swing.JComboBox<String> gristCacheComboBox;
     private javax.swing.JLabel gristCacheLabel;
@@ -1552,7 +1573,6 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JSpinner gristCacheSpinner;
     private javax.swing.JLabel hpDividerLabel;
     private javax.swing.JLabel hpLabel;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel knowledgeLabel;
     private javax.swing.JSpinner knowledgeSpinner;
     private javax.swing.JLabel levelLabel;
