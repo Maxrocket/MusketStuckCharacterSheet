@@ -1296,11 +1296,11 @@ public class Window extends javax.swing.JFrame {
         skillProfButton.setLocation(20, 140 + yCount);
         
         techniquePanel.setLocation(220, 385 + armourPanel.getHeight() + attacksPanel.getHeight());
-        yCount = 0;
+        yCount = 5;
         for (String[] technique : c.techniques) {
             TechniqueListElement techniqueLabel = new TechniqueListElement(yCount, 280, this, technique[0], technique[1], technique[2]);
             techniqueListPanel.add(techniqueLabel);
-            yCount += 20;
+            yCount += 25;
         }
         techniqueListPanel.setSize(280, yCount);
         techniquePanel.setSize(320, 50 + yCount);
