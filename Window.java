@@ -47,6 +47,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
 import musketstuckcharactersheet.onRollFunctions.DoubleOnes;
+import musketstuckcharactersheet.ui.ResourceListElement;
 import musketstuckcharactersheet.ui.SkillProficiencyListElement;
 import musketstuckcharactersheet.ui.TechniqueListElement;
 import musketstuckcharactersheet.utils.OnRoll;
@@ -66,6 +67,7 @@ public class Window extends javax.swing.JFrame {
     public int currentGrist;
     public ArrayList<ArmourListElement> armourElements;
     public ArrayList<WeaponListElement> attackElements;
+    public ArrayList<ResourceListElement> resourceElements;
 
     public JCanvas healthBar;
     public JSpinner advantage;
@@ -157,6 +159,9 @@ public class Window extends javax.swing.JFrame {
         techniquePanel = new javax.swing.JPanel();
         techniqueLabel = new javax.swing.JLabel();
         techniqueListPanel = new javax.swing.JPanel();
+        resourcePanel = new javax.swing.JPanel();
+        resourcesLabel = new javax.swing.JLabel();
+        resourcesListPanel = new javax.swing.JPanel();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
         monsterLootTableScrollPane = new javax.swing.JScrollPane();
@@ -536,7 +541,33 @@ public class Window extends javax.swing.JFrame {
         techniqueListPanel.setBounds(20, 30, 280, 0);
 
         characterPanel.add(techniquePanel);
-        techniquePanel.setBounds(220, 485, 320, 50);
+        techniquePanel.setBounds(220, 555, 320, 50);
+
+        resourcePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        resourcePanel.setLayout(null);
+
+        resourcesLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        resourcesLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        resourcesLabel.setText("Resources");
+        resourcePanel.add(resourcesLabel);
+        resourcesLabel.setBounds(10, 10, 300, 16);
+
+        javax.swing.GroupLayout resourcesListPanelLayout = new javax.swing.GroupLayout(resourcesListPanel);
+        resourcesListPanel.setLayout(resourcesListPanelLayout);
+        resourcesListPanelLayout.setHorizontalGroup(
+            resourcesListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
+        );
+        resourcesListPanelLayout.setVerticalGroup(
+            resourcesListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        resourcePanel.add(resourcesListPanel);
+        resourcesListPanel.setBounds(20, 30, 280, 0);
+
+        characterPanel.add(resourcePanel);
+        resourcePanel.setBounds(220, 485, 320, 50);
 
         characterScrollPane.setViewportView(characterPanel);
 
@@ -778,6 +809,13 @@ public class Window extends javax.swing.JFrame {
                         c.techniques.add(new String[]{technique.children.get("name").get(0).textContent,
                             technique.children.get("source").get(0).textContent,
                             technique.children.get("description").get(0).textContent});
+                    }
+                }
+
+                if (character.children.containsKey("resource")) {
+                    for (XMLElement resource : character.children.get("resource")) {
+                        c.resources.put(resource.children.get("name").get(0).textContent,
+                                Integer.parseInt(resource.children.get("value").get(0).textContent));
                     }
                 }
 
@@ -1307,7 +1345,19 @@ public class Window extends javax.swing.JFrame {
         proficiencyPanel.setSize(180, 180 + yCount);
         skillProfButton.setLocation(20, 140 + yCount);
 
-        techniquePanel.setLocation(220, 385 + armourPanel.getHeight() + attacksPanel.getHeight());
+        resourceElements = new ArrayList();
+        resourcePanel.setLocation(220, attacksPanel.getY() + attacksPanel.getHeight() + 20);
+        yCount = 5;
+        for (Entry<String, Integer> entry : c.resources.entrySet()) {
+            ResourceListElement resourceElement = new ResourceListElement(yCount, 280, this, entry.getKey(), entry.getValue());
+            resourceElements.add(resourceElement);
+            resourcesListPanel.add(resourceElement);
+            yCount += 25;
+        }
+        resourcesListPanel.setSize(280, yCount);
+        resourcePanel.setSize(320, 50 + yCount);
+        
+        techniquePanel.setLocation(220, resourcePanel.getY() + resourcePanel.getHeight() + 20);
         yCount = 5;
         for (String[] technique : c.techniques) {
             TechniqueListElement techniqueLabel = new TechniqueListElement(yCount, 280, this, technique[0], technique[1], technique[2]);
@@ -1316,7 +1366,7 @@ public class Window extends javax.swing.JFrame {
         }
         techniqueListPanel.setSize(280, yCount);
         techniquePanel.setSize(320, 50 + yCount);
-        
+
         Dimension d = new Dimension(560, Math.max(proficiencyPanel.getY() + proficiencyPanel.getHeight() + 20, techniquePanel.getY() + techniquePanel.getHeight() + 20));
         characterPanel.setPreferredSize(d);
 
@@ -1345,6 +1395,14 @@ public class Window extends javax.swing.JFrame {
             String gristName = c.gristCache.get(currentGrist).getKey();
             c.gristCache.remove(currentGrist);
             c.gristCache.add(currentGrist, new Pair(gristName, gristCacheSpinner.getValue()));
+            
+            for (ResourceListElement resourceElement : resourceElements) {
+                for (Entry<String, Integer> entry : c.resources.entrySet()) {
+                    if (entry.getKey().equals(resourceElement.name)) {
+                        entry.setValue((int) resourceElement.counter.getValue());
+                    }
+                }
+            }
 
             saveCharacter(c);
         } catch (Exception e) {
@@ -1420,6 +1478,12 @@ public class Window extends javax.swing.JFrame {
                 fw.append("        <source>" + technique[1] + "</source>\n");
                 fw.append("        <description>" + technique[2] + "</description>\n");
                 fw.append("    </technique>\n");
+            }
+            for (Entry<String, Integer> entry : c.resources.entrySet()) {
+                fw.append("    <resource>\n");
+                fw.append("        <name>" + entry.getKey() + "</name>\n");
+                fw.append("        <value>" + entry.getValue() + "</value>\n");
+                fw.append("    </resource>\n");
             }
             for (String string : c.onRollFunctions.keySet()) {
                 fw.append("    <onRoll>" + string + "</onRoll>\n");
@@ -1603,6 +1667,9 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextField profTextField;
     private javax.swing.JCheckBox proficiencyCheckbox;
     private javax.swing.JPanel proficiencyPanel;
+    private javax.swing.JPanel resourcePanel;
+    private javax.swing.JLabel resourcesLabel;
+    private javax.swing.JPanel resourcesListPanel;
     private javax.swing.JLabel safetyLabel;
     private javax.swing.JSpinner safetySpinner;
     private javax.swing.JSeparator seperator1;

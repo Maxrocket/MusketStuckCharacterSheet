@@ -23,6 +23,7 @@ public class Character {
     public ArrayList<Weapon> weapons;
     public ArrayList<String> skillProficiencies;
     public ArrayList<String[]> techniques;
+    public HashMap<String, Integer> resources;
     
     public static Armour DEFAULT_ARMOUR = new Armour("Default Armour", 0, 20);
     public static ArrayList<Attack> DEFAULT_ATTACK = new ArrayList<Attack>((List<Attack>)Arrays.asList(new Attack("Punch", 0, "1d4", 20, 2, "BOD")));
@@ -51,6 +52,7 @@ public class Character {
         equiped = DEFAULT_ARMOUR;
         skillProficiencies = new ArrayList();
         techniques = new ArrayList();
+        resources = new HashMap();
     }
 
     public void addOnRoll(String name, OnRoll r) {
