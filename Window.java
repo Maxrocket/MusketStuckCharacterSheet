@@ -1483,6 +1483,7 @@ public class Window extends javax.swing.JFrame {
 
             g.setColor(Color.white);
             g.fillRect(0, 0, getWidth(), getHeight());
+            
             try {
                 int width = (int) (getWidth() * ((Integer.parseInt(HPTextField.getText()) + 0.0) / (Integer.parseInt(totalHPTextField.getText()) + 0.0)));
                 g.setColor(Color.red);
@@ -1493,7 +1494,11 @@ public class Window extends javax.swing.JFrame {
             } catch (Exception e) {
 
             }
+            
             g.setColor(Color.GRAY);
+            for (int i = 1; i <= Integer.parseInt(totalHPTextField.getText() + 1); i++) {
+                g.drawLine((getWidth() / Integer.parseInt(totalHPTextField.getText())) * i, 0, (getWidth() / Integer.parseInt(totalHPTextField.getText())) * i, getHeight());
+            }
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
     }
