@@ -47,6 +47,7 @@ import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
 import musketstuckcharactersheet.onRollFunctions.DoubleOnes;
 import musketstuckcharactersheet.ui.SkillProficiencyListElement;
+import musketstuckcharactersheet.ui.TechniqueListElement;
 import musketstuckcharactersheet.utils.OnRoll;
 import musketstuckcharactersheet.utils.Output;
 import musketstuckcharactersheet.utils.XMLElement;
@@ -152,6 +153,9 @@ public class Window extends javax.swing.JFrame {
         skillProficiencyLabel = new javax.swing.JLabel();
         skillProficienciesPanel = new javax.swing.JPanel();
         skillProfButton = new javax.swing.JButton();
+        techniquePanel = new javax.swing.JPanel();
+        techniqueLabel = new javax.swing.JLabel();
+        techniqueListPanel = new javax.swing.JPanel();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
         monsterLootTableScrollPane = new javax.swing.JScrollPane();
@@ -504,6 +508,32 @@ public class Window extends javax.swing.JFrame {
         characterPanel.add(proficiencyPanel);
         proficiencyPanel.setBounds(20, 625, 180, 180);
 
+        techniquePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        techniquePanel.setLayout(null);
+
+        techniqueLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        techniqueLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        techniqueLabel.setText("Techniques");
+        techniquePanel.add(techniqueLabel);
+        techniqueLabel.setBounds(10, 10, 300, 16);
+
+        javax.swing.GroupLayout techniqueListPanelLayout = new javax.swing.GroupLayout(techniqueListPanel);
+        techniqueListPanel.setLayout(techniqueListPanelLayout);
+        techniqueListPanelLayout.setHorizontalGroup(
+            techniqueListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
+        );
+        techniqueListPanelLayout.setVerticalGroup(
+            techniqueListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        techniquePanel.add(techniqueListPanel);
+        techniqueListPanel.setBounds(20, 30, 280, 0);
+
+        characterPanel.add(techniquePanel);
+        techniquePanel.setBounds(220, 485, 320, 50);
+
         characterScrollPane.setViewportView(characterPanel);
 
         mainTabPane.addTab("Character Sheet", characterScrollPane);
@@ -729,6 +759,14 @@ public class Window extends javax.swing.JFrame {
                         Weapon weaponItem = new Weapon(weapon.children.get("name").get(0).textContent,
                                 weapon.children.get("type").get(0).textContent, attackList);
                         c.addItem(weaponItem);
+                    }
+                }
+
+                if (character.children.containsKey("technique")) {
+                    for (XMLElement technique : character.children.get("technique")) {
+                        c.techniques.add(new String[]{technique.children.get("name").get(0).textContent,
+                            technique.children.get("source").get(0).textContent,
+                            technique.children.get("description").get(0).textContent});
                     }
                 }
 
@@ -1256,6 +1294,16 @@ public class Window extends javax.swing.JFrame {
         skillProficienciesPanel.setSize(140, yCount);
         proficiencyPanel.setSize(180, 180 + yCount);
         skillProfButton.setLocation(20, 140 + yCount);
+        
+        techniquePanel.setLocation(220, 385 + armourPanel.getHeight() + attacksPanel.getHeight());
+        yCount = 0;
+        for (String[] technique : c.techniques) {
+            TechniqueListElement techniqueLabel = new TechniqueListElement(yCount, 280, this, technique[0], technique[1], technique[2]);
+            techniqueListPanel.add(techniqueLabel);
+            yCount += 20;
+        }
+        techniqueListPanel.setSize(280, yCount);
+        techniquePanel.setSize(320, 50 + yCount);
 
         refresh();
     }
@@ -1347,6 +1395,13 @@ public class Window extends javax.swing.JFrame {
                     }
                 }
                 fw.append("    </weapon>\n");
+            }
+            for (String[] technique : c.techniques) {
+                fw.append("    <technique>\n");
+                fw.append("        <name>" + technique[0] + "</name>\n");
+                fw.append("        <source>" + technique[1] + "</source>\n");
+                fw.append("        <description>" + technique[2] + "</description>\n");
+                fw.append("    </technique>\n");
             }
             for (String string : c.onRollFunctions.keySet()) {
                 fw.append("    <onRoll>" + string + "</onRoll>\n");
@@ -1529,6 +1584,9 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JButton skillProfButton;
     private javax.swing.JPanel skillProficienciesPanel;
     private javax.swing.JLabel skillProficiencyLabel;
+    private javax.swing.JLabel techniqueLabel;
+    private javax.swing.JPanel techniqueListPanel;
+    private javax.swing.JPanel techniquePanel;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;
     private javax.swing.JTextField totalHPTextField;
