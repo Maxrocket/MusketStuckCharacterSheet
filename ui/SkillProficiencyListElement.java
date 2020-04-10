@@ -27,23 +27,13 @@ public class SkillProficiencyListElement extends JLabel {
         this.setLocation(0, y);
         this.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
-                Object[] possibilities = {"BOD", "DEX", "MND", "MAG", "ASP"};
-                String s = (String) JOptionPane.showInputDialog(
-                        window,
-                        "Select attribute for skill roll:",
-                        "Input required",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        possibilities,
-                        "BOD");
-
                 Pair<String, Integer> hitRolls = DiceParser.parse("(1d20)a" + Math.abs((int) window.advantage.getValue())).roll(onRollFunctions, OnRoll.Trigger.ABILITY);
                 if ((int) window.advantage.getValue() < 0) {
                     hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) window.advantage.getValue())).roll(onRollFunctions, OnRoll.Trigger.ABILITY);
                 }
-                int result = hitRolls.getValue() + Integer.parseInt(window.modRef.get(s).getText()) + Integer.parseInt(window.prof.getText());
+                int result = hitRolls.getValue() + Integer.parseInt(window.modRef.get((String) window.skillMod.getSelectedItem()).getText()) + Integer.parseInt(window.prof.getText());
                 
-                String output = hitRolls.getKey() + "+" + window.modRef.get(s).getText() + "+" + window.prof.getText() + "=" + result;
+                String output = hitRolls.getKey() + "+" + window.modRef.get((String) window.skillMod.getSelectedItem()).getText() + "+" + window.prof.getText() + "=" + result;
                 
                 Output.outputText(text + " Roll", output, window);
             }

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,6 +48,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
 import musketstuckcharactersheet.onRollFunctions.DoubleOnes;
+import musketstuckcharactersheet.ui.LevelGraphCanvas;
 import musketstuckcharactersheet.ui.ResourceListElement;
 import musketstuckcharactersheet.ui.SkillProficiencyListElement;
 import musketstuckcharactersheet.ui.TechniqueListElement;
@@ -75,6 +77,7 @@ public class Window extends javax.swing.JFrame {
     public JCheckBox discord;
     public JTextArea area;
     public Window window;
+    public JComboBox skillMod;
 
     public Window() {
         initComponents();
@@ -156,6 +159,8 @@ public class Window extends javax.swing.JFrame {
         skillProficiencyLabel = new javax.swing.JLabel();
         skillProficienciesPanel = new javax.swing.JPanel();
         skillProfButton = new javax.swing.JButton();
+        skillModifierCombobox = new javax.swing.JComboBox<>();
+        skillModifierLabel = new javax.swing.JLabel();
         techniquePanel = new javax.swing.JPanel();
         techniqueLabel = new javax.swing.JLabel();
         techniqueListPanel = new javax.swing.JPanel();
@@ -388,6 +393,11 @@ public class Window extends javax.swing.JFrame {
         levelsLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         levelsLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         levelsLabel.setText("Levels");
+        levelsLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                levelsLabelMouseClicked(evt);
+            }
+        });
         levelPanel.add(levelsLabel);
         levelsLabel.setBounds(10, 10, 300, 16);
 
@@ -489,7 +499,7 @@ public class Window extends javax.swing.JFrame {
 
         weaponKindLabel.setText("-kind");
         proficiencyPanel.add(weaponKindLabel);
-        weaponKindLabel.setBounds(131, 40, 30, 30);
+        weaponKindLabel.setBounds(130, 40, 30, 30);
 
         weaponProficiencyTextField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         proficiencyPanel.add(weaponProficiencyTextField);
@@ -503,7 +513,7 @@ public class Window extends javax.swing.JFrame {
 
         skillProficienciesPanel.setLayout(null);
         proficiencyPanel.add(skillProficienciesPanel);
-        skillProficienciesPanel.setBounds(20, 120, 140, 0);
+        skillProficienciesPanel.setBounds(20, 149, 140, 0);
 
         skillProfButton.setText("Add New Prof");
         skillProfButton.addActionListener(new java.awt.event.ActionListener() {
@@ -512,10 +522,18 @@ public class Window extends javax.swing.JFrame {
             }
         });
         proficiencyPanel.add(skillProfButton);
-        skillProfButton.setBounds(20, 140, 140, 25);
+        skillProfButton.setBounds(20, 160, 140, 25);
+
+        skillModifierCombobox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BOD", "DEX", "MND", "MAG", "ASP" }));
+        proficiencyPanel.add(skillModifierCombobox);
+        skillModifierCombobox.setBounds(80, 120, 80, 22);
+
+        skillModifierLabel.setText("Modifier: ");
+        proficiencyPanel.add(skillModifierLabel);
+        skillModifierLabel.setBounds(20, 120, 60, 20);
 
         characterPanel.add(proficiencyPanel);
-        proficiencyPanel.setBounds(20, 625, 180, 180);
+        proficiencyPanel.setBounds(20, 625, 180, 200);
 
         techniquePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         techniquePanel.setLayout(null);
@@ -627,44 +645,43 @@ public class Window extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(seperator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(diceRollerLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(37, 37, 37)
+                .addComponent(outputCheckbox)
+                .addGap(39, 39, 39)
+                .addComponent(advLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(outputScrollPane)
                     .addComponent(mainTabPane)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addComponent(diceRollerLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(outputCheckbox)
-                        .addGap(42, 42, 42)
-                        .addComponent(advLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)))
+                    .addComponent(outputScrollPane, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
-            .addComponent(seperator1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(mainTabPane, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap()
+                .addComponent(mainTabPane, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(seperator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(diceRollerLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(outputCheckbox)
-                        .addComponent(advLabel)
-                        .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(9, 9, 9)
-                .addComponent(outputScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(diceRollerLabel)
+                    .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(outputCheckbox)
+                    .addComponent(advLabel)
+                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(outputScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12))
         );
 
         pack();
@@ -677,6 +694,7 @@ public class Window extends javax.swing.JFrame {
         discord = outputCheckbox;
         area = outputTextArea;
         window = this;
+        skillMod = skillModifierCombobox;
 
         characters = new HashMap();
         String selectedCharacter;
@@ -1184,6 +1202,10 @@ public class Window extends javax.swing.JFrame {
         loadCharacter(characters.get(currentSelection));
     }//GEN-LAST:event_skillProfButtonActionPerformed
 
+    private void levelsLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_levelsLabelMouseClicked
+        JOptionPane.showMessageDialog(this, new LevelGraphCanvas(500, (int)powerSpinner.getValue(), (int)knowledgeSpinner.getValue(), (int)safetySpinner.getValue(), (int)aspectSpinner.getValue()), "Level Graph", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_levelsLabelMouseClicked
+
     public void rollDeathSave() {
         rollDeathSave(0);
     }
@@ -1342,8 +1364,8 @@ public class Window extends javax.swing.JFrame {
             yCount += 20;
         }
         skillProficienciesPanel.setSize(140, yCount);
-        proficiencyPanel.setSize(180, 180 + yCount);
-        skillProfButton.setLocation(20, 140 + yCount);
+        proficiencyPanel.setSize(180, 200 + yCount);
+        skillProfButton.setLocation(20, 160 + yCount);
 
         resourceElements = new ArrayList();
         resourcePanel.setLocation(220, attacksPanel.getY() + attacksPanel.getHeight() + 20);
@@ -1673,6 +1695,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel safetyLabel;
     private javax.swing.JSpinner safetySpinner;
     private javax.swing.JSeparator seperator1;
+    private javax.swing.JComboBox<String> skillModifierCombobox;
+    private javax.swing.JLabel skillModifierLabel;
     private javax.swing.JButton skillProfButton;
     private javax.swing.JPanel skillProficienciesPanel;
     private javax.swing.JLabel skillProficiencyLabel;
