@@ -64,9 +64,9 @@ public class Attack {
             boolean isCrit = false;
             if (hitRolls.getValue() >= crit) {
                 isCrit = true;
-            }       
+            }
             int toHit = hitRolls.getValue() + hitBonus + hitAbility + prof;
-            
+
             output = "To Hit: " + hitRolls.getKey();
             if (hitBonus != 0) {
                 output += "+" + hitBonus;
@@ -76,7 +76,7 @@ public class Attack {
                 output += "+" + prof;
             }
             output += "=" + toHit;
-            
+
             if (isCrit) {
                 output += " CRIT";
             }
@@ -99,7 +99,14 @@ public class Attack {
                 totalDamage += damageRolls.getValue() + hitAbility;
                 output += damageRolls.getKey() + "+" + hitAbility;
             }
+
+            output = output.replace("+-", "-");
+            output = output.replace("--", "+");
+
             output += "=" + totalDamage;
+            if (totalDamage < 0) {
+                output += " [0]";
+            }
         }
 
         return output;

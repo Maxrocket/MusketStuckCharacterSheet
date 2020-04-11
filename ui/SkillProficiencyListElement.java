@@ -32,9 +32,12 @@ public class SkillProficiencyListElement extends JLabel {
                     hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) window.advantage.getValue())).roll(onRollFunctions, OnRoll.Trigger.ABILITY);
                 }
                 int result = hitRolls.getValue() + Integer.parseInt(window.modRef.get((String) window.skillMod.getSelectedItem()).getText()) + Integer.parseInt(window.prof.getText());
-                
+
                 String output = hitRolls.getKey() + "+" + window.modRef.get((String) window.skillMod.getSelectedItem()).getText() + "+" + window.prof.getText() + "=" + result;
-                
+
+                output = output.replace("+-", "-");
+                output = output.replace("--", "+");
+
                 Output.outputText(text + " Roll", output, window);
             }
 

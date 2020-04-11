@@ -971,6 +971,9 @@ public class Window extends javax.swing.JFrame {
                     }
                     output += "=" + result;
 
+                    output = output.replace("+-", "-");
+                    output = output.replace("--", "+");
+
                     Output.outputText(string + " Roll", output, window);
                 }
 
@@ -1052,6 +1055,9 @@ public class Window extends javax.swing.JFrame {
                             input = input.replace(entry.getKey(), entry.getValue().getText());
                         }
                         input = input.replace("PROF", profTextField.getText());
+
+                        input = input.replace("+-", "-");
+                        input = input.replace("--", "+");
 
                         Pair<String, Integer> output = DiceParser.parse(input).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.ROLL);
 
@@ -1203,7 +1209,7 @@ public class Window extends javax.swing.JFrame {
     }//GEN-LAST:event_skillProfButtonActionPerformed
 
     private void levelsLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_levelsLabelMouseClicked
-        JOptionPane.showMessageDialog(this, new LevelGraphCanvas(500, (int)powerSpinner.getValue(), (int)knowledgeSpinner.getValue(), (int)safetySpinner.getValue(), (int)aspectSpinner.getValue()), "Level Graph", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new LevelGraphCanvas(500, (int) powerSpinner.getValue(), (int) knowledgeSpinner.getValue(), (int) safetySpinner.getValue(), (int) aspectSpinner.getValue()), "Level Graph", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_levelsLabelMouseClicked
 
     public void rollDeathSave() {
@@ -1224,6 +1230,9 @@ public class Window extends javax.swing.JFrame {
             output += "+" + Integer.parseInt(profTextField.getText());
         }
         output += "=" + result;
+
+        output = output.replace("+-", "-");
+        output = output.replace("--", "+");
 
         String rollResult = "FAILIURE";
         boolean crit = false;
@@ -1378,7 +1387,7 @@ public class Window extends javax.swing.JFrame {
         }
         resourcesListPanel.setSize(280, yCount);
         resourcePanel.setSize(320, 50 + yCount);
-        
+
         techniquePanel.setLocation(220, resourcePanel.getY() + resourcePanel.getHeight() + 20);
         yCount = 5;
         for (String[] technique : c.techniques) {
@@ -1417,7 +1426,7 @@ public class Window extends javax.swing.JFrame {
             String gristName = c.gristCache.get(currentGrist).getKey();
             c.gristCache.remove(currentGrist);
             c.gristCache.add(currentGrist, new Pair(gristName, gristCacheSpinner.getValue()));
-            
+
             for (ResourceListElement resourceElement : resourceElements) {
                 for (Entry<String, Integer> entry : c.resources.entrySet()) {
                     if (entry.getKey().equals(resourceElement.name)) {
