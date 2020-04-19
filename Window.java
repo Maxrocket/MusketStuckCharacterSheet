@@ -856,7 +856,7 @@ public class Window extends javax.swing.JFrame {
                         }
                     }
                 }
-                
+
                 if (character.children.containsKey("onMod")) {
                     for (XMLElement onMod : character.children.get("onMod")) {
 
@@ -894,6 +894,9 @@ public class Window extends javax.swing.JFrame {
                                                 attackItem.setDamageAdvantage(true);
                                             }
                                         }
+                                    }
+                                    if (attack.children.containsKey("critDamage")) {
+                                        attackItem.setCritDamage(attack.children.get("critDamage").get(0).textContent);
                                     }
                                 } else {
                                     attackItem = new Attack(attack.children.get("name").get(0).textContent,
@@ -1677,6 +1680,9 @@ public class Window extends javax.swing.JFrame {
                         fw.append("            <ability>" + attack.abi + "</ability>\n");
                         if (attack.damageAdvantage) {
                             fw.append("            <bonus>damageAdvantage</bonus>\n");
+                        }
+                        if (!attack.critDamage.equals("0")) {
+                            fw.append("            <critDamage>" + attack.critDamage + "</critDamage>\n");
                         }
                         fw.append("        </attack>\n");
                     }

@@ -34,6 +34,9 @@ public class AttackListElement extends JLabel {
                 text += " ADV";
             } 
             text += ", " + a.crit + "/x" + a.critMul;
+            if (!a.critDamage.equals("0")) {
+                text += "+" + a.critDamage;
+            }
         }
 
         this.setText(text);

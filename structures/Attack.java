@@ -15,6 +15,8 @@ public class Attack {
     public int critMul;
     public String abi;
     public String name;
+    
+    public String critDamage;
 
     public boolean damageAdvantage = false;
 
@@ -32,6 +34,7 @@ public class Attack {
         this.critMul = critMul;
         this.abi = abi;
         this.c = c;
+        critDamage = "0";
     }
 
     public Attack(String name, String dmg, Character c) {
@@ -39,6 +42,7 @@ public class Attack {
         this.name = name;
         this.dmg = dmg;
         this.c = c;
+        critDamage = "0";
     }
 
     public void addOnRoll(OnRoll r) {
@@ -51,6 +55,10 @@ public class Attack {
 
     public void setDamageAdvantage(boolean b) {
         damageAdvantage = b;
+    }
+    
+    public void setCritDamage(String critDamage) {
+        this.critDamage = critDamage;
     }
 
     public String attack(int adv, int prf, int abi) {
@@ -108,6 +116,11 @@ public class Attack {
                 if (c.damageBonus != 0) {
                     output += "+" + c.damageBonus;
                 }
+            }
+            if (isCrit && !critDamage.equals("0")) {
+                Pair<String, Integer> critDamageRolls = DiceParser.parse(critDamage).roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
+                totalDamage += critDamageRolls.getValue();
+                output += "+" + critDamageRolls.getKey();
             }
 
             output = output.replace("+-", "-");
