@@ -1,9 +1,9 @@
 package musketstuckcharactersheet;
 
 import musketstuckcharactersheet.ui.WeaponListElement;
-import musketstuckcharactersheet.ui.ArmourListElement;
+import musketstuckcharactersheet.ui.EquipmentListElement;
 import musketstuckcharactersheet.structures.Monster;
-import musketstuckcharactersheet.structures.Armour;
+import musketstuckcharactersheet.structures.Equipment;
 import musketstuckcharactersheet.structures.Weapon;
 import musketstuckcharactersheet.structures.Attack;
 import musketstuckcharactersheet.structures.Character;
@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -47,12 +46,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
-import musketstuckcharactersheet.onRollFunctions.DoubleOnes;
+import musketstuckcharactersheet.onFunctions.DeathConsume;
+import musketstuckcharactersheet.onFunctions.OnMod;
+import musketstuckcharactersheet.structures.Armour;
+import musketstuckcharactersheet.structures.Equipment.EquipmentState;
 import musketstuckcharactersheet.ui.LevelGraphCanvas;
 import musketstuckcharactersheet.ui.ResourceListElement;
 import musketstuckcharactersheet.ui.SkillProficiencyListElement;
 import musketstuckcharactersheet.ui.TechniqueListElement;
-import musketstuckcharactersheet.utils.OnRoll;
+import musketstuckcharactersheet.onFunctions.OnRoll;
 import musketstuckcharactersheet.utils.Output;
 import musketstuckcharactersheet.utils.XMLElement;
 import musketstuckcharactersheet.utils.XMLReader;
@@ -61,20 +63,21 @@ public class Window extends javax.swing.JFrame {
 
     public HashMap<String, JTextField> modRef;
     public HashMap<String, JTextField> statRef;
+    public HashMap<String, JTextField> tempStatRef;
     public HashMap<String, JLabel> labelRef;
 
     public HashMap<String, Character> characters;
     public HashMap<String, Monster> monsters;
     public String currentSelection;
     public int currentGrist;
-    public ArrayList<ArmourListElement> armourElements;
+    public ArrayList<EquipmentListElement> equipmentElements;
     public ArrayList<WeaponListElement> attackElements;
     public ArrayList<ResourceListElement> resourceElements;
 
     public JCanvas healthBar;
     public JSpinner advantage;
     public JTextField prof;
-    public JCheckBox discord;
+    public JComboBox discord;
     public JTextArea area;
     public Window window;
     public JComboBox skillMod;
@@ -87,7 +90,6 @@ public class Window extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        outputCheckbox = new javax.swing.JCheckBox();
         advSpinner = new javax.swing.JSpinner();
         advLabel = new javax.swing.JLabel();
         outputScrollPane = new javax.swing.JScrollPane();
@@ -122,6 +124,11 @@ public class Window extends javax.swing.JFrame {
         aspModTextField = new javax.swing.JTextField();
         attributesLabel = new javax.swing.JLabel();
         proficiencyCheckbox = new javax.swing.JCheckBox();
+        bodTempStatTextField = new javax.swing.JTextField();
+        dexTempStatTextField = new javax.swing.JTextField();
+        mndTempStatTextField = new javax.swing.JTextField();
+        magTempStatTextField = new javax.swing.JTextField();
+        aspTempStatTextField = new javax.swing.JTextField();
         characterComboBox = new javax.swing.JComboBox<>();
         newButton = new javax.swing.JButton();
         profLabel = new javax.swing.JLabel();
@@ -146,9 +153,9 @@ public class Window extends javax.swing.JFrame {
         gristCacheComboBox = new javax.swing.JComboBox<>();
         gristCacheSpinner = new javax.swing.JSpinner();
         newGristButton = new javax.swing.JButton();
-        armourPanel = new javax.swing.JPanel();
-        armourLabel = new javax.swing.JLabel();
-        armourListPanel = new javax.swing.JPanel();
+        equipmentPanel = new javax.swing.JPanel();
+        equipmentLabel = new javax.swing.JLabel();
+        equipmentListPanel = new javax.swing.JPanel();
         attacksPanel = new javax.swing.JPanel();
         attacksLabel = new javax.swing.JLabel();
         attacksListPanel = new javax.swing.JPanel();
@@ -167,6 +174,10 @@ public class Window extends javax.swing.JFrame {
         resourcePanel = new javax.swing.JPanel();
         resourcesLabel = new javax.swing.JLabel();
         resourcesListPanel = new javax.swing.JPanel();
+        hitBonusLabel = new javax.swing.JLabel();
+        hitBonusTextField = new javax.swing.JTextField();
+        damageBonusLabel = new javax.swing.JLabel();
+        damageBonusTextField = new javax.swing.JTextField();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
         monsterLootTableScrollPane = new javax.swing.JScrollPane();
@@ -175,9 +186,11 @@ public class Window extends javax.swing.JFrame {
         seperator1 = new javax.swing.JSeparator();
         diceRollerLabel = new javax.swing.JLabel();
         diceRollerTextField = new javax.swing.JTextField();
+        outputComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Homestuck Character Sheet");
+        setPreferredSize(new java.awt.Dimension(630, 1020));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -186,8 +199,6 @@ public class Window extends javax.swing.JFrame {
                 formWindowOpened(evt);
             }
         });
-
-        outputCheckbox.setText("Output To Discord");
 
         advLabel.setText("Adv:");
 
@@ -259,56 +270,56 @@ public class Window extends javax.swing.JFrame {
         attributePanel.add(bodLabel);
         bodLabel.setBounds(20, 40, 33, 30);
         attributePanel.add(bodStatTextField);
-        bodStatTextField.setBounds(60, 40, 45, 30);
+        bodStatTextField.setBounds(60, 40, 30, 30);
 
         bodModTextField.setEditable(false);
         bodModTextField.setText("auto");
         attributePanel.add(bodModTextField);
-        bodModTextField.setBounds(115, 40, 45, 30);
+        bodModTextField.setBounds(130, 40, 30, 30);
 
         dexLabel.setText("DEX:");
         attributePanel.add(dexLabel);
         dexLabel.setBounds(20, 80, 28, 30);
         attributePanel.add(dexStatTextField);
-        dexStatTextField.setBounds(60, 80, 45, 30);
+        dexStatTextField.setBounds(60, 80, 30, 30);
 
         dexModTextField.setEditable(false);
         dexModTextField.setText("auto");
         attributePanel.add(dexModTextField);
-        dexModTextField.setBounds(115, 80, 45, 30);
+        dexModTextField.setBounds(130, 80, 30, 30);
 
         mndLabel.setText("MND:");
         attributePanel.add(mndLabel);
         mndLabel.setBounds(20, 120, 31, 30);
         attributePanel.add(mndStatTextField);
-        mndStatTextField.setBounds(60, 120, 45, 30);
+        mndStatTextField.setBounds(60, 120, 30, 30);
 
         mndModTextField.setEditable(false);
         mndModTextField.setText("auto");
         attributePanel.add(mndModTextField);
-        mndModTextField.setBounds(115, 120, 45, 30);
+        mndModTextField.setBounds(129, 120, 31, 30);
 
         magLabel.setText("MAG:");
         attributePanel.add(magLabel);
         magLabel.setBounds(20, 160, 31, 30);
         attributePanel.add(magStatTextField);
-        magStatTextField.setBounds(60, 160, 45, 30);
+        magStatTextField.setBounds(60, 160, 30, 30);
 
         magModTextField.setEditable(false);
         magModTextField.setText("auto");
         attributePanel.add(magModTextField);
-        magModTextField.setBounds(115, 160, 45, 30);
+        magModTextField.setBounds(130, 160, 30, 30);
 
         aspLabel.setText("ASP:");
         attributePanel.add(aspLabel);
         aspLabel.setBounds(20, 200, 28, 30);
         attributePanel.add(aspStatTextField);
-        aspStatTextField.setBounds(60, 200, 45, 30);
+        aspStatTextField.setBounds(60, 200, 30, 30);
 
         aspModTextField.setEditable(false);
         aspModTextField.setText("auto");
         attributePanel.add(aspModTextField);
-        aspModTextField.setBounds(115, 200, 45, 30);
+        aspModTextField.setBounds(130, 200, 30, 30);
 
         attributesLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         attributesLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -319,6 +330,16 @@ public class Window extends javax.swing.JFrame {
         proficiencyCheckbox.setText("Proficiency");
         attributePanel.add(proficiencyCheckbox);
         proficiencyCheckbox.setBounds(20, 240, 140, 25);
+        attributePanel.add(bodTempStatTextField);
+        bodTempStatTextField.setBounds(90, 40, 30, 30);
+        attributePanel.add(dexTempStatTextField);
+        dexTempStatTextField.setBounds(90, 80, 30, 30);
+        attributePanel.add(mndTempStatTextField);
+        mndTempStatTextField.setBounds(90, 120, 30, 30);
+        attributePanel.add(magTempStatTextField);
+        magTempStatTextField.setBounds(90, 160, 30, 30);
+        attributePanel.add(aspTempStatTextField);
+        aspTempStatTextField.setBounds(90, 200, 30, 30);
 
         characterPanel.add(attributePanel);
         attributePanel.setBounds(20, 140, 180, 280);
@@ -436,31 +457,31 @@ public class Window extends javax.swing.JFrame {
         characterPanel.add(gristCachePanel);
         gristCachePanel.setBounds(20, 440, 180, 165);
 
-        armourPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        armourPanel.setLayout(null);
+        equipmentPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        equipmentPanel.setLayout(null);
 
-        armourLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        armourLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        armourLabel.setText("Armour");
-        armourPanel.add(armourLabel);
-        armourLabel.setBounds(10, 10, 300, 16);
+        equipmentLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        equipmentLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        equipmentLabel.setText("Equipment");
+        equipmentPanel.add(equipmentLabel);
+        equipmentLabel.setBounds(10, 10, 300, 16);
 
-        javax.swing.GroupLayout armourListPanelLayout = new javax.swing.GroupLayout(armourListPanel);
-        armourListPanel.setLayout(armourListPanelLayout);
-        armourListPanelLayout.setHorizontalGroup(
-            armourListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout equipmentListPanelLayout = new javax.swing.GroupLayout(equipmentListPanel);
+        equipmentListPanel.setLayout(equipmentListPanelLayout);
+        equipmentListPanelLayout.setHorizontalGroup(
+            equipmentListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 280, Short.MAX_VALUE)
         );
-        armourListPanelLayout.setVerticalGroup(
-            armourListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        equipmentListPanelLayout.setVerticalGroup(
+            equipmentListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        armourPanel.add(armourListPanel);
-        armourListPanel.setBounds(20, 30, 280, 0);
+        equipmentPanel.add(equipmentListPanel);
+        equipmentListPanel.setBounds(20, 30, 280, 0);
 
-        characterPanel.add(armourPanel);
-        armourPanel.setBounds(220, 345, 320, 50);
+        characterPanel.add(equipmentPanel);
+        equipmentPanel.setBounds(220, 345, 320, 50);
 
         attacksPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         attacksPanel.setLayout(null);
@@ -486,7 +507,7 @@ public class Window extends javax.swing.JFrame {
         attacksListPanel.setBounds(20, 30, 280, 0);
 
         characterPanel.add(attacksPanel);
-        attacksPanel.setBounds(220, 415, 320, 50);
+        attacksPanel.setBounds(220, 455, 320, 50);
 
         proficiencyPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         proficiencyPanel.setLayout(null);
@@ -559,7 +580,7 @@ public class Window extends javax.swing.JFrame {
         techniqueListPanel.setBounds(20, 30, 280, 0);
 
         characterPanel.add(techniquePanel);
-        techniquePanel.setBounds(220, 555, 320, 50);
+        techniquePanel.setBounds(220, 595, 320, 50);
 
         resourcePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         resourcePanel.setLayout(null);
@@ -585,7 +606,25 @@ public class Window extends javax.swing.JFrame {
         resourcesListPanel.setBounds(20, 30, 280, 0);
 
         characterPanel.add(resourcePanel);
-        resourcePanel.setBounds(220, 485, 320, 50);
+        resourcePanel.setBounds(220, 525, 320, 50);
+
+        hitBonusLabel.setText("Hit Bonus:");
+        characterPanel.add(hitBonusLabel);
+        hitBonusLabel.setBounds(220, 410, 60, 30);
+
+        hitBonusTextField.setEditable(false);
+        hitBonusTextField.setText("auto");
+        characterPanel.add(hitBonusTextField);
+        hitBonusTextField.setBounds(290, 410, 50, 30);
+
+        damageBonusLabel.setText("Damage Bonus:");
+        characterPanel.add(damageBonusLabel);
+        damageBonusLabel.setBounds(390, 410, 100, 30);
+
+        damageBonusTextField.setEditable(false);
+        damageBonusTextField.setText("auto");
+        characterPanel.add(damageBonusTextField);
+        damageBonusTextField.setBounds(490, 410, 50, 30);
 
         characterScrollPane.setViewportView(characterPanel);
 
@@ -641,47 +680,49 @@ public class Window extends javax.swing.JFrame {
 
         diceRollerLabel.setText("Dice Roller: ");
 
+        outputComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Window", "Prospit", "Derse", "Skaia", "LOTAO", "LOWAC", "LOTAB", "LOSAM" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(seperator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(mainTabPane, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
+                    .addComponent(outputScrollPane, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(diceRollerLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
-                .addComponent(outputCheckbox)
-                .addGap(39, 39, 39)
+                .addGap(51, 51, 51)
+                .addComponent(outputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(56, 56, 56)
                 .addComponent(advLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(mainTabPane)
-                    .addComponent(outputScrollPane, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap())
+                .addGap(20, 20, 20))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(mainTabPane, javax.swing.GroupLayout.PREFERRED_SIZE, 515, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(mainTabPane, javax.swing.GroupLayout.DEFAULT_SIZE, 721, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(seperator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(diceRollerLabel)
                     .addComponent(diceRollerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(outputCheckbox)
                     .addComponent(advLabel)
-                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(advSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(outputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(outputScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12))
+                .addContainerGap())
         );
 
         pack();
@@ -691,7 +732,7 @@ public class Window extends javax.swing.JFrame {
         File tmpDir = new File("data/startup.xml");
         advantage = advSpinner;
         prof = profTextField;
-        discord = outputCheckbox;
+        discord = outputComboBox;
         area = outputTextArea;
         window = this;
         skillMod = skillModifierCombobox;
@@ -715,10 +756,13 @@ public class Window extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10, "");
+            Character c = new Character(s, 10, 10, 10, 10, 10,
+                    0, 0, 0, 0, 0,
+                    0, 0, 0, 0,
+                    "", "", 10, "");
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
-            c.addItem(Character.DEFAULT_WEAPON);
+            c.addItem(c.DEFAULT_WEAPON);
             characterComboBox.addItem(s);
             characters.put(s, c);
             selectedCharacter = s;
@@ -737,6 +781,11 @@ public class Window extends javax.swing.JFrame {
                         Integer.parseInt(character.children.get("mnd").get(0).textContent),
                         Integer.parseInt(character.children.get("mag").get(0).textContent),
                         Integer.parseInt(character.children.get("asp").get(0).textContent),
+                        Integer.parseInt(character.children.get("bodT").get(0).textContent),
+                        Integer.parseInt(character.children.get("dexT").get(0).textContent),
+                        Integer.parseInt(character.children.get("mndT").get(0).textContent),
+                        Integer.parseInt(character.children.get("magT").get(0).textContent),
+                        Integer.parseInt(character.children.get("aspT").get(0).textContent),
                         Integer.parseInt(character.children.get("power").get(0).textContent),
                         Integer.parseInt(character.children.get("safety").get(0).textContent),
                         Integer.parseInt(character.children.get("knowledge").get(0).textContent),
@@ -753,13 +802,35 @@ public class Window extends javax.swing.JFrame {
 
                 if (character.children.containsKey("armour")) {
                     for (XMLElement armour : character.children.get("armour")) {
-                        Armour armourItem = new Armour(armour.children.get("name").get(0).textContent,
+                        Equipment armourItem = new Armour(armour.children.get("name").get(0).textContent,
                                 Integer.parseInt(armour.children.get("acBonus").get(0).textContent),
                                 Integer.parseInt(armour.children.get("maxDexMod").get(0).textContent));
                         c.addItem(armourItem);
-                        if (character.children.get("equiped").get(0).textContent.equals(armourItem.name)) {
-                            c.equiped = armourItem;
+                        if (armour.children.get("equiped").get(0).textContent.equals("true")) {
+                            armourItem.states.get(0).equiped = true;
                         }
+                    }
+                }
+                if (character.children.containsKey("equipment")) {
+                    for (XMLElement equipment : character.children.get("equipment")) {
+                        Equipment equipmentItem = new Equipment(equipment.children.get("name").get(0).textContent);
+                        for (XMLElement state : equipment.children.get("state")) {
+                            EquipmentState stateItem = equipmentItem.createNewState();
+                            if (state.children.containsKey("bonus")) {
+                                for (XMLElement bonus : state.children.get("bonus")) {
+                                    stateItem.addBonus(bonus.children.get("stat").get(0).textContent, Integer.parseInt(bonus.children.get("value").get(0).textContent));
+                                }
+                            }
+                            if (state.children.containsKey("limit")) {
+                                for (XMLElement limit : state.children.get("limit")) {
+                                    stateItem.addLimit(limit.children.get("stat").get(0).textContent, Integer.parseInt(limit.children.get("value").get(0).textContent));
+                                }
+                            }
+                            if (state.children.get("equiped").get(0).textContent.equals("true")) {
+                                stateItem.equiped = true;
+                            }
+                        }
+                        c.addItem(equipmentItem);
                     }
                 }
 
@@ -773,13 +844,30 @@ public class Window extends javax.swing.JFrame {
                     for (XMLElement onRoll : character.children.get("onRoll")) {
 
                         try {
-                            Class onRollClass = Class.forName("musketstuckcharactersheet.onRollFunctions." + onRoll.textContent);
+                            Class onRollClass = Class.forName("musketstuckcharactersheet.onFunctions." + onRoll.textContent);
                             Class[] types = {};
                             Constructor constructor = onRollClass.getConstructor(types);
                             Object[] parameters = {};
                             OnRoll onRollInstance = (OnRoll) constructor.newInstance(parameters);
 
                             c.addOnRoll(onRoll.textContent, onRollInstance);
+                        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                
+                if (character.children.containsKey("onMod")) {
+                    for (XMLElement onMod : character.children.get("onMod")) {
+
+                        try {
+                            Class onModClass = Class.forName("musketstuckcharactersheet.onFunctions." + onMod.textContent);
+                            Class[] types = {};
+                            Constructor constructor = onModClass.getConstructor(types);
+                            Object[] parameters = {};
+                            OnMod onModInstance = (OnMod) constructor.newInstance(parameters);
+
+                            c.addOnMod(onMod.textContent, onModInstance);
                         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                             Logger.getLogger(Window.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -799,7 +887,7 @@ public class Window extends javax.swing.JFrame {
                                             attack.children.get("damage").get(0).textContent,
                                             Integer.parseInt(attack.children.get("crit").get(0).textContent),
                                             Integer.parseInt(attack.children.get("critMul").get(0).textContent),
-                                            attack.children.get("ability").get(0).textContent);
+                                            attack.children.get("ability").get(0).textContent, c);
                                     if (attack.children.containsKey("bonus")) {
                                         for (XMLElement bonus : attack.children.get("bonus")) {
                                             if (bonus.textContent.equals("damageAdvantage")) {
@@ -809,7 +897,7 @@ public class Window extends javax.swing.JFrame {
                                     }
                                 } else {
                                     attackItem = new Attack(attack.children.get("name").get(0).textContent,
-                                            attack.children.get("damage").get(0).textContent);
+                                            attack.children.get("damage").get(0).textContent, c);
                                 }
                                 attackItem.addOnRoll(c.getOnRollFunctions());
                                 attackList.add(attackItem);
@@ -862,8 +950,8 @@ public class Window extends javax.swing.JFrame {
 
         }
         characterComboBox.setSelectedItem(selectedCharacter);
-        loadCharacter(characters.get(selectedCharacter));
         currentSelection = selectedCharacter;
+        loadCharacter(characters.get(selectedCharacter));
         currentGrist = 0;
 
         characterComboBox.addItemListener(new ItemListener() {
@@ -900,6 +988,12 @@ public class Window extends javax.swing.JFrame {
         statRef.put("MND", mndStatTextField);
         statRef.put("MAG", magStatTextField);
         statRef.put("ASP", aspStatTextField);
+        tempStatRef = new HashMap();
+        tempStatRef.put("BODT", bodTempStatTextField);
+        tempStatRef.put("DEXT", dexTempStatTextField);
+        tempStatRef.put("MNDT", mndTempStatTextField);
+        tempStatRef.put("MAGT", magTempStatTextField);
+        tempStatRef.put("ASPT", aspTempStatTextField);
 
         DocumentListener changeUpdater = new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
@@ -917,6 +1011,9 @@ public class Window extends javax.swing.JFrame {
 
         for (String string : statRef.keySet()) {
             statRef.get(string).getDocument().addDocumentListener(changeUpdater);
+        }
+        for (String string : tempStatRef.keySet()) {
+            tempStatRef.get(string).getDocument().addDocumentListener(changeUpdater);
         }
 
         HPTextField.getDocument().addDocumentListener(changeUpdater);
@@ -1103,10 +1200,13 @@ public class Window extends javax.swing.JFrame {
         if (found) {
             JOptionPane.showMessageDialog(this, "This name already exists.", "Input required", JOptionPane.ERROR_MESSAGE);
         } else {
-            Character c = new Character(s, 10, 10, 10, 10, 10, 0, 0, 0, 0, "", "", 10, "");
+            Character c = new Character(s, 10, 10, 10, 10, 10,
+                    0, 0, 0, 0, 0,
+                    0, 0, 0, 0,
+                    "", "", 10, "");
             c.addGrist("Build Grist", 0);
             c.addGrist("Abstraction Grist", 0);
-            c.addItem(Character.DEFAULT_WEAPON);
+            c.addItem(c.DEFAULT_WEAPON);
             characterComboBox.addItem(s);
             characters.put(s, c);
         }
@@ -1250,28 +1350,65 @@ public class Window extends javax.swing.JFrame {
     }
 
     public void refresh() {
+
+        characters.get(currentSelection).acBonus = 0;
+        characters.get(currentSelection).maxDexMod = 100;
+        characters.get(currentSelection).hitBonus = 0;
+        characters.get(currentSelection).damageBonus = 0;
+        characters.get(currentSelection).bodB = 0;
+        characters.get(currentSelection).dexB = 0;
+        characters.get(currentSelection).mndB = 0;
+        characters.get(currentSelection).magB = 0;
+        characters.get(currentSelection).aspB = 0;
+        for (OnMod onModFunction : characters.get(currentSelection).getOnModFunctions()) {
+            onModFunction.modStats(characters.get(currentSelection), this);
+        }
+        for (Equipment equipment : characters.get(currentSelection).equipment) {
+            for (EquipmentState state : equipment.states) {
+                if (state.equiped) {
+                    if (equipment instanceof Armour) {
+                        characters.get(currentSelection).acBonus += ((Armour) equipment).acBonus;
+                        characters.get(currentSelection).maxDexMod = Math.min(characters.get(currentSelection).maxDexMod, ((Armour) equipment).maxDexMod);
+                    } else {
+                        for (Entry<String, Integer> entry : state.bonuses.entrySet()) {
+                            if (entry.getKey().equals("AC")) {
+                                characters.get(currentSelection).acBonus += entry.getValue();
+                            } else if (entry.getKey().equals("Hit")) {
+                                characters.get(currentSelection).hitBonus += entry.getValue();
+                            } else if (entry.getKey().equals("Damage")) {
+                                characters.get(currentSelection).damageBonus += entry.getValue();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        hitBonusTextField.setText(characters.get(currentSelection).hitBonus + "");
+        damageBonusTextField.setText(characters.get(currentSelection).damageBonus + "");
+
         try {
-            bodModTextField.setText(((Integer.parseInt(bodStatTextField.getText()) - 10) / 2) + "");
+            bodModTextField.setText(((Integer.parseInt(bodStatTextField.getText()) - 10 + Integer.parseInt(bodTempStatTextField.getText()) + characters.get(currentSelection).bodB) / 2) + "");
         } catch (Exception x) {
             bodModTextField.setText("");
         }
         try {
-            dexModTextField.setText(Math.min(characters.get(currentSelection).equiped.maxDexMod, (Integer.parseInt(dexStatTextField.getText()) - 10) / 2) + "");
+            dexModTextField.setText(((Integer.parseInt(dexStatTextField.getText()) - 10 + Integer.parseInt(dexTempStatTextField.getText()) + characters.get(currentSelection).dexB) / 2) + "");
         } catch (Exception x) {
             dexModTextField.setText("");
         }
         try {
-            mndModTextField.setText(((Integer.parseInt(mndStatTextField.getText()) - 10) / 2) + "");
+            mndModTextField.setText(((Integer.parseInt(mndStatTextField.getText()) - 10 + Integer.parseInt(mndTempStatTextField.getText()) + characters.get(currentSelection).mndB) / 2) + "");
         } catch (Exception x) {
             mndModTextField.setText("");
         }
         try {
-            magModTextField.setText(((Integer.parseInt(magStatTextField.getText()) - 10) / 2) + "");
+            magModTextField.setText(((Integer.parseInt(magStatTextField.getText()) - 10 + Integer.parseInt(magTempStatTextField.getText()) + characters.get(currentSelection).magB) / 2) + "");
         } catch (Exception x) {
             magModTextField.setText("");
         }
         try {
-            aspModTextField.setText(((Integer.parseInt(aspStatTextField.getText()) - 10) / 2) + "");
+            aspModTextField.setText(((Integer.parseInt(aspStatTextField.getText()) - 10 + Integer.parseInt(aspTempStatTextField.getText()) + characters.get(currentSelection).aspB) / 2) + "");
         } catch (Exception x) {
             aspModTextField.setText("");
         }
@@ -1283,7 +1420,7 @@ public class Window extends javax.swing.JFrame {
             profTextField.setText("");
         }
         try {
-            acTextField.setText((characters.get(currentSelection).equiped.acBonus + 10 + Integer.parseInt(modRef.get("DEX").getText())) + "");
+            acTextField.setText((characters.get(currentSelection).acBonus + 10 + Math.min(characters.get(currentSelection).maxDexMod, Integer.parseInt(modRef.get("DEX").getText()))) + "");
         } catch (Exception x) {
             acTextField.setText("");
         }
@@ -1312,6 +1449,12 @@ public class Window extends javax.swing.JFrame {
         magStatTextField.setText(c.mag + "");
         aspStatTextField.setText(c.asp + "");
 
+        bodTempStatTextField.setText(c.bodT + "");
+        dexTempStatTextField.setText(c.dexT + "");
+        mndTempStatTextField.setText(c.mndT + "");
+        magTempStatTextField.setText(c.magT + "");
+        aspTempStatTextField.setText(c.aspT + "");
+
         powerSpinner.setValue(c.power);
         safetySpinner.setValue(c.safety);
         knowledgeSpinner.setValue(c.knowledge);
@@ -1335,24 +1478,26 @@ public class Window extends javax.swing.JFrame {
         currentGrist = 0;
         gristCacheSpinner.setValue(c.gristCache.get(currentGrist).getValue());
 
-        armourElements = new ArrayList();
-        int size = c.armourpodes.size();
-        armourPanel.setSize(320, 50 + size * 50);
-        armourListPanel.setSize(280, size * 50);
-        armourListPanel.removeAll();
-        for (int i = 0; i < c.armourpodes.size(); i++) {
-            boolean equiped = false;
-            if (c.armourpodes.get(i).name.equals(c.equiped.name)) {
-                equiped = true;
-            }
-            ArmourListElement element = new ArmourListElement(10 * (i + 1) + 40 * i, 280, equiped, armourElements, this, c.armourpodes.get(i));
-            armourListPanel.add(element);
-            armourElements.add(element);
+        equipmentElements = new ArrayList();
+        equipmentListPanel.removeAll();
+        int yCount = 0;
+        for (int i = 0; i < c.equipment.size(); i++) {
+            EquipmentListElement element = new EquipmentListElement(yCount, 280, window, c.equipment.get(i));
+            yCount += element.getHeight();
+            equipmentListPanel.add(element);
+            equipmentElements.add(element);
         }
+        equipmentPanel.setSize(320, 50 + yCount);
+        equipmentListPanel.setSize(280, yCount);
+
+        hitBonusLabel.setLocation(hitBonusLabel.getX(), equipmentPanel.getY() + equipmentPanel.getHeight() + 20);
+        hitBonusTextField.setLocation(hitBonusTextField.getX(), equipmentPanel.getY() + equipmentPanel.getHeight() + 20);
+        damageBonusLabel.setLocation(damageBonusLabel.getX(), equipmentPanel.getY() + equipmentPanel.getHeight() + 20);
+        damageBonusTextField.setLocation(damageBonusTextField.getX(), equipmentPanel.getY() + equipmentPanel.getHeight() + 20);
 
         attackElements = new ArrayList();
-        attacksPanel.setLocation(220, armourPanel.getY() + armourPanel.getHeight() + 20);
-        int yCount = 0;
+        attacksPanel.setLocation(220, equipmentPanel.getY() + equipmentPanel.getHeight() + 70);
+        yCount = 0;
         attacksListPanel.removeAll();
         for (int i = 0; i < c.weapons.size(); i++) {
             yCount += 10;
@@ -1412,6 +1557,12 @@ public class Window extends javax.swing.JFrame {
             c.mag = Integer.parseInt(magStatTextField.getText());
             c.asp = Integer.parseInt(aspStatTextField.getText());
 
+            c.bodT = Integer.parseInt(bodTempStatTextField.getText());
+            c.dexT = Integer.parseInt(dexTempStatTextField.getText());
+            c.mndT = Integer.parseInt(mndTempStatTextField.getText());
+            c.magT = Integer.parseInt(magTempStatTextField.getText());
+            c.aspT = Integer.parseInt(aspTempStatTextField.getText());
+
             c.power = (int) powerSpinner.getValue();
             c.safety = (int) safetySpinner.getValue();
             c.knowledge = (int) knowledgeSpinner.getValue();
@@ -1452,6 +1603,11 @@ public class Window extends javax.swing.JFrame {
             fw.append("    <mnd>" + c.mnd + "</mnd>\n");
             fw.append("    <mag>" + c.mag + "</mag>\n");
             fw.append("    <asp>" + c.asp + "</asp>\n");
+            fw.append("    <bodT>" + c.bodT + "</bodT>\n");
+            fw.append("    <dexT>" + c.dexT + "</dexT>\n");
+            fw.append("    <mndT>" + c.mndT + "</mndT>\n");
+            fw.append("    <magT>" + c.magT + "</magT>\n");
+            fw.append("    <aspT>" + c.aspT + "</aspT>\n");
             fw.append("    <power>" + c.power + "</power>\n");
             fw.append("    <safety>" + c.safety + "</safety>\n");
             fw.append("    <knowledge>" + c.knowledge + "</knowledge>\n");
@@ -1469,13 +1625,37 @@ public class Window extends javax.swing.JFrame {
                 fw.append("        <quantity>" + p.getValue() + "</quantity>\n");
                 fw.append("    </grist>\n");
             }
-            fw.append("    <equiped>" + c.equiped.name + "</equiped>\n");
-            for (Armour armour : c.armourpodes) {
-                fw.append("    <armour>\n");
-                fw.append("        <name>" + armour.name + "</name>\n");
-                fw.append("        <acBonus>" + armour.acBonus + "</acBonus>\n");
-                fw.append("        <maxDexMod>" + armour.maxDexMod + "</maxDexMod>\n");
-                fw.append("    </armour>\n");
+            for (Equipment equipment : c.equipment) {
+                if (equipment instanceof Armour) {
+                    Armour armour = (Armour) equipment;
+                    fw.append("    <armour>\n");
+                    fw.append("        <name>" + armour.name + "</name>\n");
+                    fw.append("        <acBonus>" + armour.acBonus + "</acBonus>\n");
+                    fw.append("        <maxDexMod>" + armour.maxDexMod + "</maxDexMod>\n");
+                    fw.append("        <equiped>" + armour.states.get(0).equiped + "</equiped>\n");
+                    fw.append("    </armour>\n");
+                } else {
+                    fw.append("    <equipment>\n");
+                    fw.append("        <name>" + equipment.name + "</name>\n");
+                    for (EquipmentState state : equipment.states) {
+                        fw.append("        <state>\n");
+                        for (Entry<String, Integer> entry : state.bonuses.entrySet()) {
+                            fw.append("            <bonus>\n");
+                            fw.append("                <stat>" + entry.getKey() + "</stat>\n");
+                            fw.append("                <value>" + entry.getValue() + "</value>\n");
+                            fw.append("            </bonus>\n");
+                        }
+                        for (Entry<String, Integer> entry : state.limits.entrySet()) {
+                            fw.append("            <limit>\n");
+                            fw.append("                <stat>" + entry.getKey() + "</stat>\n");
+                            fw.append("                <value>" + entry.getValue() + "</value>\n");
+                            fw.append("            </limit>\n");
+                        }
+                        fw.append("            <equiped>" + state.equiped + "</equiped>\n");
+                        fw.append("        </state>\n");
+                    }
+                    fw.append("    </equipment>\n");
+                }
             }
             for (Weapon weapon : c.weapons) {
                 fw.append("    <weapon>\n");
@@ -1518,6 +1698,9 @@ public class Window extends javax.swing.JFrame {
             }
             for (String string : c.onRollFunctions.keySet()) {
                 fw.append("    <onRoll>" + string + "</onRoll>\n");
+            }
+            for (String string : c.onModFunctions.keySet()) {
+                fw.append("    <onMod>" + string + "</onMod>\n");
             }
             fw.append("</character>");
             fw.flush();
@@ -1635,12 +1818,10 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextField acTextField;
     private javax.swing.JLabel advLabel;
     private javax.swing.JSpinner advSpinner;
-    private javax.swing.JLabel armourLabel;
-    private javax.swing.JPanel armourListPanel;
-    private javax.swing.JPanel armourPanel;
     private javax.swing.JLabel aspLabel;
     private javax.swing.JTextField aspModTextField;
     private javax.swing.JTextField aspStatTextField;
+    private javax.swing.JTextField aspTempStatTextField;
     private javax.swing.JLabel aspectLabel;
     private javax.swing.JSpinner aspectSpinner;
     private javax.swing.JLabel attacksLabel;
@@ -1651,21 +1832,30 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel bodLabel;
     private javax.swing.JTextField bodModTextField;
     private javax.swing.JTextField bodStatTextField;
+    private javax.swing.JTextField bodTempStatTextField;
     private javax.swing.JComboBox<String> characterComboBox;
     private javax.swing.JPanel characterPanel;
     private javax.swing.JScrollPane characterScrollPane;
     private javax.swing.JLabel claspectLabel;
     private javax.swing.JTextField claspectTextField;
+    private javax.swing.JLabel damageBonusLabel;
+    private javax.swing.JTextField damageBonusTextField;
     private javax.swing.JLabel deathsaveLabel;
     private javax.swing.JLabel dexLabel;
     private javax.swing.JTextField dexModTextField;
     private javax.swing.JTextField dexStatTextField;
+    private javax.swing.JTextField dexTempStatTextField;
     private javax.swing.JLabel diceRollerLabel;
     private javax.swing.JTextField diceRollerTextField;
+    private javax.swing.JLabel equipmentLabel;
+    private javax.swing.JPanel equipmentListPanel;
+    private javax.swing.JPanel equipmentPanel;
     private javax.swing.JComboBox<String> gristCacheComboBox;
     private javax.swing.JLabel gristCacheLabel;
     private javax.swing.JPanel gristCachePanel;
     private javax.swing.JSpinner gristCacheSpinner;
+    private javax.swing.JLabel hitBonusLabel;
+    private javax.swing.JTextField hitBonusTextField;
     private javax.swing.JLabel hpDividerLabel;
     private javax.swing.JLabel hpLabel;
     private javax.swing.JLabel knowledgeLabel;
@@ -1680,16 +1870,18 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JLabel magLabel;
     private javax.swing.JTextField magModTextField;
     private javax.swing.JTextField magStatTextField;
+    private javax.swing.JTextField magTempStatTextField;
     private javax.swing.JTabbedPane mainTabPane;
     private javax.swing.JLabel mndLabel;
     private javax.swing.JTextField mndModTextField;
     private javax.swing.JTextField mndStatTextField;
+    private javax.swing.JTextField mndTempStatTextField;
     private javax.swing.JButton monsterLootButton;
     private javax.swing.JTable monsterLootTable;
     private javax.swing.JScrollPane monsterLootTableScrollPane;
     private javax.swing.JButton newButton;
     private javax.swing.JButton newGristButton;
-    private javax.swing.JCheckBox outputCheckbox;
+    private javax.swing.JComboBox<String> outputComboBox;
     private javax.swing.JScrollPane outputScrollPane;
     private javax.swing.JTextArea outputTextArea;
     private javax.swing.JLabel powerLabel;

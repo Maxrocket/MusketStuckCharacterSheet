@@ -3,6 +3,8 @@ package musketstuckcharactersheet.ui;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import musketstuckcharactersheet.Window;
 
 public class ResourceListElement extends JPanel {
@@ -27,6 +29,11 @@ public class ResourceListElement extends JPanel {
         counter.setValue(value);
         counter.setSize(w / 2, 20);
         counter.setLocation(w / 2, 0);
+        counter.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                frame.refresh();
+            }
+        });
         this.add(counter);
 
         this.setSize(w, 20);

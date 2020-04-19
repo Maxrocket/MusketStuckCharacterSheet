@@ -2,7 +2,7 @@ package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
 import javafx.util.Pair;
-import musketstuckcharactersheet.utils.OnRoll;
+import musketstuckcharactersheet.onFunctions.OnRoll;
 import musketstuckcharactersheet.dice.DiceParser;
 
 public class Attack {
@@ -22,19 +22,23 @@ public class Attack {
 
     public boolean straightDamage = false;
 
-    public Attack(String name, int hitBonus, String dmg, int crit, int critMul, String abi) {
+    public Character c;
+
+    public Attack(String name, int hitBonus, String dmg, int crit, int critMul, String abi, Character c) {
         this.name = name;
         this.hitBonus = hitBonus;
         this.dmg = dmg;
         this.crit = crit;
         this.critMul = critMul;
         this.abi = abi;
+        this.c = c;
     }
 
-    public Attack(String name, String dmg) {
+    public Attack(String name, String dmg, Character c) {
         straightDamage = true;
         this.name = name;
         this.dmg = dmg;
+        this.c = c;
     }
 
     public void addOnRoll(OnRoll r) {
@@ -65,11 +69,14 @@ public class Attack {
             if (hitRolls.getValue() >= crit) {
                 isCrit = true;
             }
-            int toHit = hitRolls.getValue() + hitBonus + hitAbility + prof;
+            int toHit = hitRolls.getValue() + hitBonus + c.hitBonus + hitAbility + prof;
 
             output = "To Hit: " + hitRolls.getKey();
             if (hitBonus != 0) {
                 output += "+" + hitBonus;
+            }
+            if (c.hitBonus != 0) {
+                output += "+" + c.hitBonus;
             }
             output += "+" + hitAbility;
             if (prof != 0) {
@@ -96,8 +103,11 @@ public class Attack {
                 if (damageAdvantage) {
                     damageRolls = DiceParser.parse("(" + dmg + ")a1").roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
                 }
-                totalDamage += damageRolls.getValue() + hitAbility;
+                totalDamage += damageRolls.getValue() + hitAbility + c.damageBonus;
                 output += damageRolls.getKey() + "+" + hitAbility;
+                if (c.damageBonus != 0) {
+                    output += "+" + c.damageBonus;
+                }
             }
 
             output = output.replace("+-", "-");

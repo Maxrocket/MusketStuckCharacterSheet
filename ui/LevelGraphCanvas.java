@@ -51,7 +51,7 @@ public class LevelGraphCanvas extends JPanel {
                     new int[]{getWidth() / 2 - 25 - (int) (size * (i / max)), getWidth() / 2, getWidth() / 2 + 25 + (int) (size * (i / max)), getWidth() / 2}, 4);
         }
         
-        g.setColor(Color.red);
+        g.setColor(new Color(255, 0, 0, 178));
         g.fillPolygon(new int[] {getWidth() / 2, getWidth() / 2 + 25 + (int)(size * (knowledge / max)), getWidth() / 2, getWidth() / 2 - 25 - (int)(size * (aspect / max))},
                 new int[] {getWidth() / 2 - 25 - (int)(size * (power / max)), getWidth() / 2, getWidth() / 2 + 25 + (int)(size * (safety / max)), getWidth() / 2}, 4);
         g.setColor(Color.black);

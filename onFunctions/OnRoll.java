@@ -1,4 +1,4 @@
-package musketstuckcharactersheet.utils;
+package musketstuckcharactersheet.onFunctions;
 
 import javafx.util.Pair;
 

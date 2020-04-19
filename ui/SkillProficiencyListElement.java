@@ -5,10 +5,9 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javafx.util.Pair;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import musketstuckcharactersheet.Window;
 import musketstuckcharactersheet.dice.DiceParser;
-import musketstuckcharactersheet.utils.OnRoll;
+import musketstuckcharactersheet.onFunctions.OnRoll;
 import musketstuckcharactersheet.utils.Output;
 
 public class SkillProficiencyListElement extends JLabel {

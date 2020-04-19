@@ -1,7 +1,6 @@
-package musketstuckcharactersheet.onRollFunctions;
+package musketstuckcharactersheet.onFunctions;
 
 import javafx.util.Pair;
-import musketstuckcharactersheet.utils.OnRoll;
 
 public class DoubleOnes extends OnRoll {
 
