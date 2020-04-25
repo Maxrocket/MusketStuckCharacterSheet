@@ -61,7 +61,7 @@ public class Attack {
         this.critDamage = critDamage;
     }
 
-    public String attack(int adv, int prf, int abi) {
+    public String attack(int adv, int prf, int abi, boolean doubleCritRange) {
         String output = "";
         if (straightDamage) {
             Pair<String, Integer> rolls = DiceParser.parse(dmg).roll(onRollFunctions, OnRoll.Trigger.DAMAGE);
@@ -74,6 +74,9 @@ public class Attack {
                 hitRolls = DiceParser.parse("(1d20)z" + Math.abs(adv)).roll(onRollFunctions, OnRoll.Trigger.ATTACK);
             }
             boolean isCrit = false;
+            if (doubleCritRange) {
+                crit = 21 - ((21 - crit) * 2);
+            }
             if (hitRolls.getValue() >= crit) {
                 isCrit = true;
             }

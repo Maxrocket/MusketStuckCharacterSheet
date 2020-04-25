@@ -6,7 +6,6 @@
 package musketstuckcharactersheet.structures;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *
@@ -23,15 +22,15 @@ public class Weapon extends Item {
         this.type = type;
     }
 
-    public String attack(int index, int adv, int prof, HashMap<String, Integer> stats, String weaponProf) {
-        int stat = stats.get(attacks.get(index).abi);
-        if (!weaponProf.equals(type)) {
-            prof = 0;
-        }
-        
-        String output = attacks.get(index).attack(adv, prof, stat);
-
-        return output;
-    }
+//    public String attack(int index, int adv, int prof, HashMap<String, Integer> stats, String weaponProf) {
+//        int stat = stats.get(attacks.get(index).abi);
+//        if (!weaponProf.equals(type)) {
+//            prof = 0;
+//        }
+//        
+//        String output = attacks.get(index).attack(adv, prof, stat);
+//
+//        return output;
+//    }
 
 }

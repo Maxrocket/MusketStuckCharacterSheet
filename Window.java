@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -46,7 +47,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import musketstuckcharactersheet.dice.DiceParser;
-import musketstuckcharactersheet.onFunctions.DeathConsume;
 import musketstuckcharactersheet.onFunctions.OnMod;
 import musketstuckcharactersheet.structures.Armour;
 import musketstuckcharactersheet.structures.Equipment.EquipmentState;
@@ -81,6 +81,7 @@ public class Window extends javax.swing.JFrame {
     public JTextArea area;
     public Window window;
     public JComboBox skillMod;
+    public JCheckBox doubleCRCheckbox;
 
     public Window() {
         initComponents();
@@ -178,6 +179,9 @@ public class Window extends javax.swing.JFrame {
         hitBonusTextField = new javax.swing.JTextField();
         damageBonusLabel = new javax.swing.JLabel();
         damageBonusTextField = new javax.swing.JTextField();
+        checkboxPanel = new javax.swing.JPanel();
+        checkboxLabel = new javax.swing.JLabel();
+        doubleCritRangeCheckbox = new javax.swing.JCheckBox();
         lootRollerScrollPane = new javax.swing.JScrollPane();
         lootRollerPanel = new javax.swing.JPanel();
         monsterLootTableScrollPane = new javax.swing.JScrollPane();
@@ -190,7 +194,6 @@ public class Window extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Homestuck Character Sheet");
-        setPreferredSize(new java.awt.Dimension(630, 1020));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -554,7 +557,7 @@ public class Window extends javax.swing.JFrame {
         skillModifierLabel.setBounds(20, 120, 60, 20);
 
         characterPanel.add(proficiencyPanel);
-        proficiencyPanel.setBounds(20, 625, 180, 200);
+        proficiencyPanel.setBounds(20, 715, 180, 200);
 
         techniquePanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         techniquePanel.setLayout(null);
@@ -625,6 +628,37 @@ public class Window extends javax.swing.JFrame {
         damageBonusTextField.setText("auto");
         characterPanel.add(damageBonusTextField);
         damageBonusTextField.setBounds(490, 410, 50, 30);
+
+        checkboxPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        checkboxLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        checkboxLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        checkboxLabel.setText("Checkboxs");
+
+        doubleCritRangeCheckbox.setText("Double Crit Range");
+
+        javax.swing.GroupLayout checkboxPanelLayout = new javax.swing.GroupLayout(checkboxPanel);
+        checkboxPanel.setLayout(checkboxPanelLayout);
+        checkboxPanelLayout.setHorizontalGroup(
+            checkboxPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(checkboxLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(checkboxPanelLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(doubleCritRangeCheckbox, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
+        );
+        checkboxPanelLayout.setVerticalGroup(
+            checkboxPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(checkboxPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(checkboxLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(doubleCritRangeCheckbox)
+                .addContainerGap())
+        );
+
+        characterPanel.add(checkboxPanel);
+        checkboxPanel.setBounds(20, 625, 180, 70);
 
         characterScrollPane.setViewportView(characterPanel);
 
@@ -736,6 +770,7 @@ public class Window extends javax.swing.JFrame {
         area = outputTextArea;
         window = this;
         skillMod = skillModifierCombobox;
+        doubleCRCheckbox = doubleCritRangeCheckbox;
 
         characters = new HashMap();
         String selectedCharacter;
@@ -1112,6 +1147,12 @@ public class Window extends javax.swing.JFrame {
             }
 
             public void mouseExited(MouseEvent e) {
+            }
+        });
+
+        doubleCritRangeCheckbox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                loadCharacter(characters.get(selectedCharacter));
             }
         });
 
@@ -1511,6 +1552,7 @@ public class Window extends javax.swing.JFrame {
         }
         attacksListPanel.setSize(280, yCount);
         attacksPanel.setSize(320, 50 + yCount);
+        System.out.println("loading character");
 
         yCount = 0;
         skillProficienciesPanel.removeAll();
@@ -1549,6 +1591,7 @@ public class Window extends javax.swing.JFrame {
         Dimension d = new Dimension(560, Math.max(proficiencyPanel.getY() + proficiencyPanel.getHeight() + 20, techniquePanel.getY() + techniquePanel.getHeight() + 20));
         characterPanel.setPreferredSize(d);
 
+        this.repaint();
         refresh();
     }
 
@@ -1842,6 +1885,8 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> characterComboBox;
     private javax.swing.JPanel characterPanel;
     private javax.swing.JScrollPane characterScrollPane;
+    private javax.swing.JLabel checkboxLabel;
+    private javax.swing.JPanel checkboxPanel;
     private javax.swing.JLabel claspectLabel;
     private javax.swing.JTextField claspectTextField;
     private javax.swing.JLabel damageBonusLabel;
@@ -1853,6 +1898,7 @@ public class Window extends javax.swing.JFrame {
     private javax.swing.JTextField dexTempStatTextField;
     private javax.swing.JLabel diceRollerLabel;
     private javax.swing.JTextField diceRollerTextField;
+    private javax.swing.JCheckBox doubleCritRangeCheckbox;
     private javax.swing.JLabel equipmentLabel;
     private javax.swing.JPanel equipmentListPanel;
     private javax.swing.JPanel equipmentPanel;

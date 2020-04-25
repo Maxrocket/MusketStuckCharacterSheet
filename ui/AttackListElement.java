@@ -33,7 +33,11 @@ public class AttackListElement extends JLabel {
             if (a.damageAdvantage) {
                 text += " ADV";
             } 
-            text += ", " + a.crit + "/x" + a.critMul;
+            int crit = a.crit;
+            if (frame.doubleCRCheckbox.isSelected()) {
+                crit = 21 - ((21 - crit) * 2);
+            }
+            text += ", " + crit + "/x" + a.critMul;
             if (!a.critDamage.equals("0")) {
                 text += "+" + a.critDamage;
             }
@@ -46,14 +50,14 @@ public class AttackListElement extends JLabel {
         this.addMouseListener(new MouseInputListener() {
             public void mouseClicked(MouseEvent e) {
                 if (a.straightDamage) {
-                    String output = a.attack(0, 0, 0);
+                    String output = a.attack(0, 0, 0, false);
                     Output.outputText(a.name + " Attack", output, frame);
                 } else {
                     int prof = Integer.parseInt(frame.prof.getText());
                     if (!type.equals(frame.characters.get(frame.currentSelection).weaponProf)) {
                         prof = 0;
                     }
-                    String output = a.attack((int) frame.advantage.getValue(), prof, Integer.parseInt(frame.modRef.get(a.abi).getText()));
+                    String output = a.attack((int) frame.advantage.getValue(), prof, Integer.parseInt(frame.modRef.get(a.abi).getText()), frame.doubleCRCheckbox.isSelected());
                     Output.outputText(a.name + " Attack", output, frame);
                 }
             }
