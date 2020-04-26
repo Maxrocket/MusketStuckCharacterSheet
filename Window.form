@@ -1179,7 +1179,7 @@
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="doubleCritRangeCheckbox">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Double Crit Range"/>
+                        <Property name="text" type="java.lang.String" value=" Double Crit Range"/>
                       </Properties>
                     </Component>
                   </SubComponents>

@@ -635,7 +635,7 @@ public class Window extends javax.swing.JFrame {
         checkboxLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         checkboxLabel.setText("Checkboxs");
 
-        doubleCritRangeCheckbox.setText("Double Crit Range");
+        doubleCritRangeCheckbox.setText(" Double Crit Range");
 
         javax.swing.GroupLayout checkboxPanelLayout = new javax.swing.GroupLayout(checkboxPanel);
         checkboxPanel.setLayout(checkboxPanelLayout);
@@ -1365,20 +1365,50 @@ public class Window extends javax.swing.JFrame {
         if ((int) advSpinner.getValue() < 0) {
             hitRolls = DiceParser.parse("(1d20)z" + Math.abs((int) advSpinner.getValue())).roll(characters.get(currentSelection).getOnRollFunctions(), OnRoll.Trigger.SAVE);
         }
-        int result = hitRolls.getValue() + Integer.parseInt(modRef.get("BOD").getText());
-        if (proficiencyCheckbox.isSelected()) {
-            result += Integer.parseInt(profTextField.getText());
+        int result = hitRolls.getValue() + Integer.parseInt(modRef.get("ASP").getText());
+
+        boolean bodySave = false;
+        for (String[] technique : characters.get(currentSelection).techniques) {
+            if (technique[0].equals("Body Save Proficiency")) {
+                bodySave = true;
+            }
         }
-        String output = hitRolls.getKey() + "+" + modRef.get("BOD").getText();
-        if (proficiencyCheckbox.isSelected()) {
-            output += "+" + Integer.parseInt(profTextField.getText());
+        boolean aspSave = false;
+        for (String[] technique : characters.get(currentSelection).techniques) {
+            if (technique[0].equals("Aspect Save Proficiency")) {
+                aspSave = true;
+            }
+        }
+        boolean undead = false;
+        for (String[] technique : characters.get(currentSelection).techniques) {
+            if (technique[0].equals("Undead")) {
+                undead = true;
+            }
+        }
+        String output;
+        if (undead) {
+            if (proficiencyCheckbox.isSelected() || aspSave) {
+                result += Integer.parseInt(profTextField.getText());
+            }
+            output = hitRolls.getKey() + "+" + modRef.get("ASP").getText();
+            if (proficiencyCheckbox.isSelected() || aspSave) {
+                output += "+" + Integer.parseInt(profTextField.getText());
+            }
+        } else {
+            if (proficiencyCheckbox.isSelected() || bodySave) {
+                result += Integer.parseInt(profTextField.getText());
+            }
+            output = hitRolls.getKey() + "+" + modRef.get("BOD").getText();
+            if (proficiencyCheckbox.isSelected() || bodySave) {
+                output += "+" + Integer.parseInt(profTextField.getText());
+            }
         }
         output += "=" + result;
 
         output = output.replace("+-", "-");
         output = output.replace("--", "+");
 
-        String rollResult = "FAILIURE";
+        String rollResult = "FAILURE";
         boolean crit = false;
         if (hitRolls.getValue() == 20) {
             rollResult = "CRITICAL SUCCESS, DAMAGE AVOIDED";
@@ -1469,11 +1499,17 @@ public class Window extends javax.swing.JFrame {
             acTextField.setText("");
         }
         try {
-            totalHPTextField.setText(((int) powerSpinner.getValue() * (5 + Integer.parseInt(modRef.get("BOD").getText()))
-                    + (int) safetySpinner.getValue() * (7 + Integer.parseInt(modRef.get("BOD").getText()))
-                    + (int) knowledgeSpinner.getValue() * (4 + Integer.parseInt(modRef.get("BOD").getText()))
-                    + (int) aspectSpinner.getValue() * (5 + Integer.parseInt(modRef.get("BOD").getText()))
-                    + 10 + Integer.parseInt(modRef.get("BOD").getText())) + "");
+            String modifier = "BOD";
+            for (String[] technique : characters.get(currentSelection).techniques) {
+                if (technique[0].equals("Undead")) {
+                    modifier = "ASP";
+                }
+            }
+            totalHPTextField.setText(((int) powerSpinner.getValue() * (5 + Integer.parseInt(modRef.get(modifier).getText()))
+                    + (int) safetySpinner.getValue() * (7 + Integer.parseInt(modRef.get(modifier).getText()))
+                    + (int) knowledgeSpinner.getValue() * (4 + Integer.parseInt(modRef.get(modifier).getText()))
+                    + (int) aspectSpinner.getValue() * (5 + Integer.parseInt(modRef.get(modifier).getText()))
+                    + 10 + Integer.parseInt(modRef.get(modifier).getText())) + "");
         } catch (Exception x) {
             totalHPTextField.setText("");
         }
@@ -1552,7 +1588,6 @@ public class Window extends javax.swing.JFrame {
         }
         attacksListPanel.setSize(280, yCount);
         attacksPanel.setSize(320, 50 + yCount);
-        System.out.println("loading character");
 
         yCount = 0;
         skillProficienciesPanel.removeAll();
@@ -1836,16 +1871,17 @@ public class Window extends javax.swing.JFrame {
                     g.setColor(Color.green);
                 }
                 g.fillRect(0, 0, Math.abs(width), getHeight());
+
+                g.setColor(Color.GRAY);
+                double segment = (getWidth() + 0.0) / (Integer.parseInt(totalHPTextField.getText()) + 0.0);
+                int segmentSize = (Integer.parseInt(totalHPTextField.getText()) / 50) + 1;
+                for (int i = segmentSize; i < Integer.parseInt(totalHPTextField.getText()); i = i + segmentSize) {
+                    g.drawLine((int) (segment * i), 0, (int) (segment * i), getHeight());
+                }
             } catch (Exception e) {
 
             }
-
             g.setColor(Color.GRAY);
-            double segment = (getWidth() + 0.0) / (Integer.parseInt(totalHPTextField.getText()) + 0.0);
-            int segmentSize = (Integer.parseInt(totalHPTextField.getText()) / 50) + 1;
-            for (int i = segmentSize; i < Integer.parseInt(totalHPTextField.getText()); i = i + segmentSize) {
-                g.drawLine((int) (segment * i), 0, (int) (segment * i), getHeight());
-            }
             g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
     }
